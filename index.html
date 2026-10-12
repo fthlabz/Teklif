@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>Fatih AVM - Teklif Sistemi</title>
+    <title>Fatih AVM - Kurumsal Teklif Sistemi</title>
     <style>
         /* =========================================
-           EKRAN GÖRÜNÜMÜ (KOYU MOD FORM - SENİN İÇİN)
+           EKRAN GÖRÜNÜMÜ (KOYU MOD FORM)
            ========================================= */
         :root {
             --bg-color: #121212;
@@ -55,15 +55,15 @@
             .full-width { grid-column: span 2; }
         }
 
-        .form-group { display: flex; flex-direction: column; }
+        .form-group { display: flex; flex-direction: column; margin-bottom: 15px; }
         label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
         
-        /* 16px font mobilde ekranın büyümesini (zoom) engeller */
-        input, textarea {
+        input, textarea, select {
             background-color: #2c2c2c; border: 1px solid var(--border-color);
             color: #ffffff; padding: 12px; border-radius: 6px; font-size: 16px; font-family: inherit;
         }
-        input[readonly] { background-color: #1a1a1a; color: #4ade80; font-weight: bold; }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary-color); }
+        input[readonly] { background-color: #1a1a1a; color: #4ade80; font-weight: bold; border: none; }
         textarea { resize: vertical; min-height: 80px; }
 
         .btn-pdf { background-color: #e53e3e; color: white; }
@@ -71,37 +71,35 @@
 
         button {
             padding: 16px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold;
-            cursor: pointer; margin-top: 15px; width: 100%;
+            cursor: pointer; margin-top: 15px; width: 100%; transition: opacity 0.2s;
         }
+        button:active { transform: scale(0.98); }
 
         /* =========================================
            BASKI / PDF GÖRÜNÜMÜ (MÜŞTERİ İÇİN BEYAZ A4)
            ========================================= */
-        #printArea {
-            display: none; /* Ekranda gizli, sadece yazdırırken açılır */
-        }
+        #printArea { display: none; }
 
         @media print {
-            /* Yazdırırken formu gizle, beyaz kağıdı göster */
             body { background-color: white !important; color: black !important; padding: 0; margin: 0; }
             #formArea { display: none !important; }
-            #printArea { display: block !important; padding: 20mm; font-family: 'Helvetica', 'Arial', sans-serif; }
-            
-            /* Arka plan renklerinin PDF'te çıkmasını zorunlu kılar */
+            #printArea { display: block !important; padding: 15mm; font-family: 'Helvetica', 'Arial', sans-serif; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            
             @page { margin: 0; size: A4; }
             
-            .p-header { display: flex; justify-content: space-between; border-bottom: 2px solid #1a365d; padding-bottom: 10px; margin-bottom: 30px; }
-            .p-title { font-size: 24pt; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase; }
-            .p-meta { text-align: right; font-size: 10pt; color: #4a5568; }
+            .p-header { display: flex; justify-content: space-between; border-bottom: 3px solid #1a365d; padding-bottom: 15px; margin-bottom: 30px; }
+            .p-title { font-size: 26pt; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+            .p-meta { text-align: right; font-size: 10pt; color: #4a5568; line-height: 1.5; }
             
-            .p-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; margin-top: 20px; }
+            .p-client-box { background-color: #f7fafc; padding: 15px; border-radius: 6px; margin-bottom: 30px; font-size: 11pt; }
+            
+            .p-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
             .p-table th, .p-table td { border: 1px solid #cbd5e0; padding: 12px; text-align: left; }
-            .p-table th { background-color: #f7fafc; color: #1a365d; font-weight: bold; }
+            .p-table th { background-color: #1a365d; color: white; font-weight: bold; font-size: 11pt; }
             
-            .p-terms { background-color: #f7fafc; padding: 15px; border-left: 4px solid #1a365d; font-size: 10pt; margin-top: 30px; }
-            .p-footer { display: flex; justify-content: space-between; margin-top: 60px; }
+            .p-terms { border: 1px solid #e2e8f0; padding: 15px; font-size: 10pt; margin-top: 30px; border-left: 4px solid #1a365d; }
+            
+            .p-legal { font-size: 7.5pt; color: #718096; text-align: justify; margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 15px; line-height: 1.4; }
         }
     </style>
 </head>
@@ -111,28 +109,70 @@
 <div id="formArea">
     <div class="header"><h1>FATİH AVM TEKLİF SİSTEMİ</h1></div>
 
-    <div class="form-grid" style="margin-bottom: 20px;">
-        <div class="form-group"><label>Müşteri / Firma Adı</label><input type="text" id="v_musteri" placeholder="Örn: XYZ A.Ş."></div>
-        <div class="form-group"><label>Yetkili Kişi</label><input type="text" id="v_yetkili" placeholder="Sayın ..."></div>
-        <div class="form-group"><label>Teklif Tarihi</label><input type="date" id="v_tarih"></div>
-        <div class="form-group"><label>Teklif No (Otomatik)</label><input type="text" id="v_refno" readonly></div>
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Müşteri Adı / Ünvanı</label>
+            <input type="text" id="v_musteri" placeholder="Müşteri adını giriniz">
+        </div>
+        <div class="form-group">
+            <label>Teklif Tarihi</label>
+            <input type="date" id="v_tarih">
+        </div>
+        <div class="form-group full-width">
+            <label>Teklif No (Sistem Otomatik Üretir)</label>
+            <input type="text" id="v_refno" readonly>
+        </div>
     </div>
 
-    <div class="form-grid" style="margin-bottom: 20px;">
-        <div class="form-group full-width"><label>Ürün / Hizmet Adı</label><input type="text" id="v_urun" placeholder="Örn: Bosch Matkap Seti"></div>
-        <div class="form-group full-width"><label>Teknik Detaylar</label><textarea id="v_detay" placeholder="Ürün özellikleri..."></textarea></div>
+    <div class="form-grid">
+        <div class="form-group full-width">
+            <label>Ürün Kategorisi (AVM Departmanı)</label>
+            <select id="v_kategori">
+                <option value="">-- Kategori Seçiniz --</option>
+                <option value="Beyaz Eşya Grubu">Beyaz Eşya Grubu</option>
+                <option value="Mobilya & Koltuk Takımı">Mobilya & Koltuk Takımı</option>
+                <option value="Halı & Ev Tekstili">Halı & Ev Tekstili</option>
+                <option value="Televizyon & Ses Sistemleri">Televizyon & Ses Sistemleri</option>
+                <option value="Cep Telefonu & Bilgisayar">Cep Telefonu & Bilgisayar</option>
+                <option value="Küçük Ev Aletleri & Züccaciye">Küçük Ev Aletleri & Züccaciye</option>
+                <option value="Çoklu Ürün / Çeyiz Paketi">Çoklu Ürün / Çeyiz Paketi</option>
+            </select>
+        </div>
+        <div class="form-group full-width">
+            <label>Ürün/Model Adı</label>
+            <input type="text" id="v_urun" placeholder="Ürün adını giriniz">
+        </div>
+        <div class="form-group full-width">
+            <label>Detaylar ve Ürün İçeriği</label>
+            <textarea id="v_detay" placeholder="Örn: 2 Yıl Garanti, Ücretsiz Kurulum, vb."></textarea>
+        </div>
     </div>
 
-    <div class="form-grid" style="margin-bottom: 20px;">
-        <div class="form-group"><label>Liste Fiyatı (Üstü Çizilir)</label><input type="number" id="v_liste" placeholder="Örn: 50000"></div>
-        <div class="form-group"><label>Net Fiyat Teklifi</label><input type="number" id="v_teklif" placeholder="Örn: 42000"></div>
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Liste Fiyatı (Üstü Çizilir)</label>
+            <!-- type="text" yapıldı ki içine ₺ ve nokta koyabilelim -->
+            <input type="text" id="v_liste" placeholder="0 ₺" oninput="paraFormati(this)">
+        </div>
+        <div class="form-group">
+            <label>Net İndirimli Teklifiniz</label>
+            <input type="text" id="v_teklif" placeholder="0 ₺" oninput="paraFormati(this)">
+        </div>
     </div>
 
-    <div class="form-grid" style="margin-bottom: 20px;">
-        <div class="form-group"><label>Geçerlilik Tarihi</label><input type="date" id="v_gecerlilik"></div>
-        <div class="form-group"><label>Teslimat Süresi</label><input type="text" id="v_teslimat" value="Stoktan Hemen Teslim"></div>
-        <div class="form-group"><label>Danışman</label><input type="text" id="v_danisman" value="Fatih"></div>
-        <div class="form-group"><label>İletişim</label><input type="text" id="v_iletisim" value="+90 537 358 30 95"></div>
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Geçerlilik Tarihi</label>
+            <input type="date" id="v_gecerlilik">
+        </div>
+        <div class="form-group">
+            <label>Danışman Adı</label>
+            <input type="text" id="v_danisman">
+        </div>
+        <div class="form-group full-width">
+            <label>İletişim Numaranız</label>
+            <input type="text" id="v_iletisim" placeholder="05XX XXX XX XX">
+        </div>
     </div>
 
     <button class="btn-pdf" onclick="pdfOnizlemeAc()">📄 PDF Ekranını Aç (Önizle ve Paylaş)</button>
@@ -140,7 +180,7 @@
 </div>
 
 <!-- ========================================================== -->
-<!-- PDF / YAZDIRMA ŞABLONU (TELEFONUN KENDİ SİSTEMİYLE ÇALIŞIR) -->
+<!-- PDF / YAZDIRMA ŞABLONU -->
 <!-- ========================================================== -->
 <div id="printArea">
     <div class="p-header">
@@ -151,29 +191,28 @@
         </div>
     </div>
 
-    <div style="font-size: 11pt; margin-bottom: 30px;">
-        <strong>Sayın Yetkili,</strong> <span id="p_yetkili"></span><br>
-        <strong>Firma:</strong> <span id="p_musteri"></span><br><br>
-        Görüşmelerimize istinaden hazırladığımız fiyat teklifi ve teknik detaylar aşağıda bilgilerinize sunulmuştur. Göstermiş olduğunuz ilgiye teşekkür ederiz.
+    <div class="p-client-box">
+        <strong>Sayın,</strong> <span id="p_musteri"></span><br><br>
+        Mağazamızda yapmış olduğunuz görüşmelere istinaden, talep etmiş olduğunuz ürünlere ait kurumsal fiyat teklifi aşağıda bilgilerinize sunulmuştur. Bizi tercih ettiğiniz için teşekkür ederiz.
     </div>
 
-    <div style="text-align: center; font-size: 16pt; font-weight: bold; color: #2d3748;">FİYAT TEKLİFİ</div>
+    <div style="text-align: center; font-size: 16pt; font-weight: bold; color: #1a365d; margin-bottom: 15px;">FİYAT TEKLİFİ</div>
 
     <table class="p-table">
         <thead>
             <tr>
-                <th style="width: 5%">No</th>
-                <th style="width: 55%">Ürün Açıklaması</th>
-                <th style="width: 20%">Liste Fiyatı</th>
-                <th style="width: 20%">Net Teklif</th>
+                <th style="width: 25%">Kategori</th>
+                <th style="width: 45%">Ürün & Detaylar</th>
+                <th style="width: 15%">Liste Fiyatı</th>
+                <th style="width: 15%">Net Tutar</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td style="vertical-align: top;">1</td>
+                <td style="vertical-align: top;"><strong><span id="p_kategori"></span></strong></td>
                 <td style="vertical-align: top;">
                     <strong><span id="p_urun"></span></strong><br><br>
-                    <span id="p_detay" style="font-size: 9pt; white-space: pre-wrap;"></span>
+                    <span id="p_detay" style="font-size: 9.5pt; white-space: pre-wrap; color: #2d3748;"></span>
                 </td>
                 <td style="vertical-align: top;"><del><span id="p_liste"></span></del></td>
                 <td style="vertical-align: top;"><strong><span id="p_teklif"></span></strong></td>
@@ -181,31 +220,37 @@
         </tbody>
     </table>
 
-    <div style="text-align: right; font-size: 14pt; font-weight: bold; color: #e53e3e;">
+    <div style="text-align: right; font-size: 16pt; font-weight: 900; color: #e53e3e; margin-bottom: 20px;">
         Genel Toplam: <span id="p_toplam"></span>
     </div>
 
     <div class="p-terms">
-        <strong>TİCARİ ŞARTLAR</strong><br>
-        • <strong>Teklif Geçerlilik:</strong> Bu teklif <span id="p_gecerlilik"></span> tarihine kadar geçerlidir.<br>
-        • <strong>Teslimat:</strong> <span id="p_teslimat"></span>
+        <strong>TİCARİ BİLGİLENDİRME</strong><br>
+        • Bu teklif formu <strong><span id="p_gecerlilik"></span></strong> tarihine kadar geçerlidir.<br>
+        • Fiyatlarımıza KDV dahildir. Stok durumuna göre fiyatlarda değişiklik hakkı saklıdır.<br>
+        • <strong>Müşteri Temsilcisi:</strong> <span id="p_danisman"></span> | <strong>İletişim:</strong> <span id="p_iletisim"></span>
     </div>
 
-    <div class="p-footer">
-        <div>
-            <strong>Firma Kaşe & İmza (Onay)</strong><br><br><br>
-            ...................................................
-        </div>
-        <div style="text-align: center;">
-            <strong>Müşteri Temsilcisi</strong><br>
-            <span id="p_danisman"></span><br>
-            İletişim: <span id="p_iletisim"></span><br>
-            <strong>FATİH AVM</strong>
-        </div>
+    <div class="p-legal">
+        <strong>KVKK ve YASAL AYDINLATMA METNİ:</strong><br>
+        İşbu teklif belgesi, yalnızca bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımamaktadır. Güncel piyasa koşulları ve anlık stok durumlarına bağlı olarak fiyat değişikliği yapma hakkı FATİH AVM'de saklıdır. Müşteri, işbu teklifin hazırlanması ve kendisine iletilmesi amacıyla kendi açık rızası ve isteğiyle beyan ettiği iletişim bilgilerinin (telefon numarası, e-posta, WhatsApp adresi) 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında FATİH AVM tarafından süreç yönetimi, müşteri memnuniyeti takibi ve ilerleyen süreçlerdeki kampanya bilgilendirmeleri amacıyla işlenmesini, saklanmasını ve söz konusu dijital/telefon kanalları üzerinden kendisiyle iletişime geçilmesini kabul, beyan ve taahhüt eder.
     </div>
 </div>
 
 <script>
+    // Canlı Para Formatlayıcı (30000 yazınca 30.000 ₺ yapar)
+    function paraFormati(input) {
+        // Sadece rakamları al
+        let deger = input.value.replace(/[^0-9]/g, '');
+        if (deger === '') {
+            input.value = '';
+            return;
+        }
+        // Sayıyı formatla ve ₺ ekle
+        let formatli = new Intl.NumberFormat('tr-TR').format(parseInt(deger));
+        input.value = formatli + ' ₺';
+    }
+
     // Referans ve Tarih Doldurma
     function referansUret() {
         let d = new Date();
@@ -226,55 +271,52 @@
         return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : val;
     }
 
-    function formatPara(val) {
-        let num = parseFloat(val) || 0;
-        return new Intl.NumberFormat('tr-TR').format(num) + " ₺";
-    }
-
-    // PDF ÖNİZLEMESİNİ (NATIVE PRINT) ÇAĞIRMA
+    // PDF ÖNİZLEMESİNİ ÇAĞIRMA
     function pdfOnizlemeAc() {
-        // Formdaki verileri beyaz şablona aktar
         let v = id => document.getElementById(id).value;
         let p = (id, val) => document.getElementById(id).innerText = val;
 
         p('p_tarih', formatTarih(v('v_tarih')));
         p('p_refno', v('v_refno'));
         p('p_musteri', v('v_musteri'));
-        p('p_yetkili', v('v_yetkili'));
+        p('p_kategori', v('v_kategori'));
         p('p_urun', v('v_urun'));
         p('p_detay', v('v_detay'));
-        p('p_liste', formatPara(v('v_liste')));
-        p('p_teklif', formatPara(v('v_teklif')));
-        p('p_toplam', formatPara(v('v_teklif')));
+        
+        // Fiyatlar zaten inputta ₺'li olduğu için direkt aktarılıyor
+        p('p_liste', v('v_liste'));
+        p('p_teklif', v('v_teklif'));
+        p('p_toplam', v('v_teklif'));
+        
         p('p_gecerlilik', formatTarih(v('v_gecerlilik')));
-        p('p_teslimat', v('v_teslimat'));
         p('p_danisman', v('v_danisman'));
         p('p_iletisim', v('v_iletisim'));
 
-        // Telefonun veya bilgisayarın kendi YAZDIR/PDF KAYDET ekranını aç
         window.print();
     }
 
-    // DOĞRUDAN WHATSAPP'A YAZI OLARAK ATMA (B PLANI)
+    // DOĞRUDAN WHATSAPP'A YAZI OLARAK ATMA
     function whatsappYaziGonder() {
         let v = id => document.getElementById(id).value;
-        let metin = `*FATİH AVM - FİYAT TEKLİFİ*
+        let metin = `*FATİH AVM - KURUMSAL FİYAT TEKLİFİ*
 
-Sayın ${v('v_yetkili')}, (${v('v_musteri')})
+Sayın ${v('v_musteri')},
 
-Görüşmemize istinaden talep ettiğiniz ürün/hizmet teklifimiz aşağıdadır:
+Görüşmemize istinaden talep ettiğiniz ürün/paket teklifimiz aşağıdadır:
 
+*Kategori:* ${v('v_kategori')}
 *Ürün:* ${v('v_urun')}
 *Detaylar:*
 ${v('v_detay')}
 
-~Liste Fiyatı: ${formatPara(v('v_liste'))}~
-*Size Özel Teklif: ${formatPara(v('v_teklif'))}*
+~Liste Fiyatı: ${v('v_liste')}~
+*Size Özel Net Teklif: ${v('v_teklif')}*
 
 _Geçerlilik Tarihi: ${formatTarih(v('v_gecerlilik'))}_
-_Teslimat: ${v('v_teslimat')}_
 
-Tüm sorularınız için bana ulaşabilirsiniz.
+*Yasal Bilgilendirme:* Tarafımıza iletmiş olduğunuz iletişim bilgileriniz, KVKK kapsamında sadece bilgilendirme amaçlı işlenmektedir.
+
+Tüm sorularınız için bana doğrudan ulaşabilirsiniz.
 *${v('v_danisman')}* - Fatih AVM
 İletişim: ${v('v_iletisim')}
 Teklif No: ${v('v_refno')}`;
