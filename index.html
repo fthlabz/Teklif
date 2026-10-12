@@ -2,252 +2,517 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kurumsal Teklif Oluşturucu</title>
+    <!-- Mobil cihazlarda otomatik zoom yapmayı engelleyen kod -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Fatih AVM - Kurumsal Teklif Sistemi</title>
+    <!-- PDF oluşturmak için gerekli dünya standartlarındaki kütüphane -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
-            margin: 0;
-            padding: 20px;
+        /* --- KOYU MOD KULLANICI ARAYÜZÜ (SENİN EKRANIN) --- */
+        :root {
+            --bg-color: #121212;
+            --surface-color: #1e1e1e;
+            --primary-color: #3b82f6;
+            --text-main: #e0e0e0;
+            --text-muted: #9e9e9e;
+            --border-color: #333333;
         }
-        .container {
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 15px;
+        }
+
+        .app-container {
             max-width: 800px;
             margin: 0 auto;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            background-color: var(--surface-color);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
+
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
             padding-bottom: 20px;
-            border-bottom: 2px solid #1a2b4c;
+            margin-bottom: 25px;
         }
+
         .header h1 {
-            color: #1a2b4c;
+            color: #ffffff;
             margin: 0;
-            font-size: 24px;
+            font-size: 26px;
+            letter-spacing: 1px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 15px;
             text-transform: uppercase;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #1a2b4c;
-            font-size: 14px;
-        }
-        input[type="text"], input[type="date"], textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-family: inherit;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-        .price-row {
-            display: flex;
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 15px;
         }
-        .price-row .form-group {
-            flex: 1;
+
+        @media(min-width: 600px) {
+            .form-grid { grid-template-columns: 1fr 1fr; }
+            .full-width { grid-column: span 2; }
         }
-        .buttons {
+
+        .form-group {
             display: flex;
-            gap: 10px;
-            margin-top: 25px;
+            flex-direction: column;
         }
+
+        label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        /* Font-size 16px olması mobilde form doldururken zoom yapılmasını engeller */
+        input, textarea, select {
+            background-color: #2c2c2c;
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 16px; 
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .action-buttons {
+            margin-top: 35px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
         button {
-            padding: 12px 20px;
+            padding: 16px;
             border: none;
-            border-radius: 4px;
-            cursor: pointer;
+            border-radius: 8px;
+            font-size: 16px;
             font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .btn-share {
+            background-color: #25D366; /* WhatsApp Yeşili */
             color: #fff;
-            flex: 1;
-            font-size: 14px;
         }
-        .btn-copy { background-color: #4a5568; }
-        .btn-wp { background-color: #2b6cb0; } /* Kurumsal Mavi */
-        .btn-mail { background-color: #2d3748; } /* Koyu Gri */
-        
-        button:hover { opacity: 0.9; }
-        
-        .output-preview {
-            margin-top: 30px;
-            padding: 15px;
-            background-color: #f8fafc;
-            border: 1px dashed #cbd5e0;
-            white-space: pre-wrap;
-            font-size: 14px;
+
+        .btn-download {
+            background-color: var(--primary-color);
+            color: #fff;
+        }
+
+        /* --- PDF ŞABLONU (GİZLİ - BEYAZ VE KURUMSAL A4 FORMATI) --- */
+        /* Bu alan ekranda görünmez, sadece PDF oluşturulurken arka planda çizilir */
+        #pdfTemplate {
             display: none;
+            background-color: #ffffff;
+            color: #000000;
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            box-sizing: border-box;
+            font-family: 'Helvetica', 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
         }
-        .info-text {
-            font-size: 12px;
-            color: #718096;
-            margin-top: 5px;
+
+        .pdf-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #1a365d;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+
+        .pdf-company-name {
+            font-size: 24pt;
+            font-weight: 900;
+            color: #1a365d;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .pdf-meta {
+            text-align: right;
+            font-size: 9pt;
+            color: #4a5568;
+        }
+
+        .pdf-client-box {
+            margin-bottom: 30px;
+        }
+
+        .pdf-title {
+            text-align: center;
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            color: #2d3748;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .pdf-table th, .pdf-table td {
+            border: 1px solid #cbd5e0;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .pdf-table th {
+            background-color: #f7fafc;
+            color: #1a365d;
+            font-weight: bold;
+        }
+
+        .pdf-totals {
+            width: 100%;
+            text-align: right;
+            margin-bottom: 30px;
+        }
+        
+        .pdf-totals div { margin-bottom: 5px; }
+        .pdf-grand-total { font-size: 14pt; font-weight: bold; color: #e53e3e; margin-top: 10px; }
+
+        .pdf-terms {
+            background-color: #f7fafc;
+            padding: 15px;
+            border-left: 4px solid #1a365d;
+            font-size: 10pt;
+            margin-bottom: 40px;
+        }
+
+        .pdf-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+        }
+
+        .pdf-signature {
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="app-container">
     <div class="header">
-        <!-- Şirket ismini buradan veya tarayıcıdan değiştirebilirsin -->
-        <h1><input type="text" id="sirketAdi" value="ŞİRKET İSMİ" style="text-align: center; font-size: 24px; font-weight: bold; border: none; background: transparent; color: #1a2b4c; text-transform: uppercase;"></h1>
-        <div class="info-text">Kurumsal Teklif Oluşturma Sistemi</div>
+        <h1>FATİH AVM TEKLİF SİSTEMİ</h1>
     </div>
 
-    <form id="teklifForm">
+    <!-- MÜŞTERİ BİLGİLERİ -->
+    <div class="section-title">Müşteri & Evrak Bilgileri</div>
+    <div class="form-grid">
         <div class="form-group">
-            <label>Müşteri / Firma Adı:</label>
-            <input type="text" id="musteriAdi" placeholder="Örn: X Lojistik A.Ş.">
+            <label>Müşteri / Firma Adı</label>
+            <input type="text" id="v_musteri" placeholder="Örn: XYZ Mimarlık A.Ş.">
         </div>
-
         <div class="form-group">
-            <label>Ürün / Hizmet Adı:</label>
-            <input type="text" id="urunAdi" placeholder="Örn: Endüstriyel Zemin Temizleme Makinesi">
+            <label>Yetkili Kişi</label>
+            <input type="text" id="v_yetkili" placeholder="Sayın ...">
         </div>
-
         <div class="form-group">
-            <label>Ürün Görseli (URL Bağlantısı):</label>
-            <input type="text" id="urunGorseli" placeholder="Örn: https://www.sirketiniz.com/urun-resmi.jpg">
-            <div class="info-text">İnternet üzerindeki bir resmin bağlantısını eklerseniz, müşteri tıkladığında doğrudan görseli görür.</div>
+            <label>Teklif Tarihi</label>
+            <input type="date" id="v_tarih">
         </div>
-
         <div class="form-group">
-            <label>Ürün Özellikleri ve Teknik Detaylar:</label>
-            <textarea id="teknikDetay" placeholder="Ürünün teknik spesifikasyonları, kapasitesi, avantajları ve müşteri için çözdüğü problemleri detaylıca yazın..."></textarea>
+            <label>Referans / Teklif No</label>
+            <input type="text" id="v_refno" value="TR-" placeholder="Örn: TR-2026-001">
         </div>
-
-        <div class="price-row">
-            <div class="form-group">
-                <label>Liste Fiyatı (Gerçek Fiyat):</label>
-                <input type="text" id="listeFiyati" placeholder="Örn: 120.000 TL + KDV">
-            </div>
-            <div class="form-group">
-                <label>Verilen Özel Fiyat Teklifi:</label>
-                <input type="text" id="teklifFiyati" placeholder="Örn: 95.000 TL + KDV">
-            </div>
-        </div>
-
-        <div class="price-row">
-            <div class="form-group">
-                <label>Teklif Geçerlilik Tarihi:</label>
-                <input type="date" id="gecerlilikTarihi">
-            </div>
-        </div>
-
-        <div class="price-row">
-            <div class="form-group">
-                <label>Danışman Adı:</label>
-                <input type="text" id="danismanAdi" placeholder="Adınız Soyadınız">
-            </div>
-            <div class="form-group">
-                <label>Direkt Ulaşım Numarası:</label>
-                <input type="text" id="ulasimNo" placeholder="Örn: 0555 555 55 55">
-            </div>
-        </div>
-    </form>
-
-    <div class="buttons">
-        <button class="btn-copy" onclick="kopyala()">Metni Kopyala</button>
-        <button class="btn-wp" onclick="whatsappGonder()">WhatsApp'a Gönder</button>
-        <button class="btn-mail" onclick="mailGonder()">E-Posta Olarak Aç</button>
     </div>
 
-    <div id="onizleme" class="output-preview"></div>
+    <!-- ÜRÜN BİLGİLERİ -->
+    <div class="section-title">Ürün & Detaylar</div>
+    <div class="form-grid">
+        <div class="form-group full-width">
+            <label>Ürün / Hizmet Adı</label>
+            <input type="text" id="v_urun" placeholder="Örn: Bosch Profesyonel Endüstriyel Set">
+        </div>
+        <div class="form-group full-width">
+            <label>Teknik Detaylar ve Açıklama</label>
+            <textarea id="v_detay" placeholder="Ürünün teknik özellikleri, ne işe yaradığı, kapasitesi..."></textarea>
+        </div>
+    </div>
+
+    <!-- FİYATLANDIRMA -->
+    <div class="section-title">Fiyatlandırma (TL)</div>
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Liste Fiyatı (Üstü Çizili Görünür)</label>
+            <input type="number" id="v_liste" placeholder="Örn: 50000">
+        </div>
+        <div class="form-group">
+            <label>Özel İskontolu Fiyat (Ara Toplam)</label>
+            <input type="number" id="v_aratoplam" placeholder="Örn: 42000" onkeyup="kdvHesapla()">
+        </div>
+        <div class="form-group">
+            <label>KDV Oranı (%)</label>
+            <select id="v_kdvoran" onchange="kdvHesapla()">
+                <option value="20">%20</option>
+                <option value="10">%10</option>
+                <option value="1">%1</option>
+                <option value="0">KDV Muaf</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Genel Toplam (KDV Dahil)</label>
+            <input type="text" id="v_geneltoplam" readonly style="background-color:#1a1a1a; color:#4ade80; font-weight:bold;">
+        </div>
+    </div>
+
+    <!-- TİCARİ ŞARTLAR VE İLETİŞİM -->
+    <div class="section-title">Ticari Şartlar & İletişim</div>
+    <div class="form-grid">
+        <div class="form-group">
+            <label>Geçerlilik Süresi</label>
+            <input type="text" id="v_gecerlilik" value="15 Gün">
+        </div>
+        <div class="form-group">
+            <label>Teslimat Süresi</label>
+            <input type="text" id="v_teslimat" value="Stoktan Hemen Teslim">
+        </div>
+        <div class="form-group">
+            <label>Danışman / Temsilci Adı</label>
+            <input type="text" id="v_danisman" value="Fatih">
+        </div>
+        <div class="form-group">
+            <label>İletişim / WhatsApp</label>
+            <input type="text" id="v_iletisim" value="+90 537 358 30 95">
+        </div>
+    </div>
+
+    <!-- BUTONLAR -->
+    <div class="action-buttons">
+        <button class="btn-share" onclick="pdfPaylas()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+            PDF Oluştur ve Doğrudan Paylaş (WhatsApp/Mail)
+        </button>
+        <button class="btn-download" onclick="pdfIndir()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Sadece Cihaza İndir
+        </button>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PDF İÇİN GİZLİ ŞABLON (B2B KURUMSAL FORMAT) -->
+<!-- ========================================== -->
+<div id="pdfTemplate">
+    <div class="pdf-header">
+        <h1 class="pdf-company-name">FATİH AVM</h1>
+        <div class="pdf-meta">
+            <div>Tarih: <span id="p_tarih"></span></div>
+            <div>Teklif No: <strong id="p_refno"></strong></div>
+        </div>
+    </div>
+
+    <div class="pdf-client-box">
+        <strong>Sayın Yetkili,</strong> <span id="p_yetkili"></span><br>
+        <strong>Firma:</strong> <span id="p_musteri"></span><br><br>
+        Görüşmelerimize istinaden, kurumunuzun ihtiyaçları doğrultusunda hazırladığımız fiyat teklifi ve teknik detaylar aşağıda bilgilerinize sunulmuştur. Göstermiş olduğunuz ilgiye teşekkür ederiz.
+    </div>
+
+    <div class="pdf-title">FİYAT TEKLİFİ</div>
+
+    <table class="pdf-table">
+        <thead>
+            <tr>
+                <th style="width: 5%">No</th>
+                <th style="width: 55%">Ürün / Hizmet Açıklaması</th>
+                <th style="width: 20%">Liste Fiyatı</th>
+                <th style="width: 20%">Net Birim Fiyat</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>
+                    <strong id="p_urun"></strong><br><br>
+                    <span id="p_detay" style="font-size: 9pt; color: #4a5568; white-space: pre-wrap;"></span>
+                </td>
+                <td><del><span id="p_liste"></span> TL</del></td>
+                <td><strong><span id="p_aratoplam"></span> TL</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="pdf-totals">
+        <div>Ara Toplam: <span id="p_aratoplam2"></span> TL</div>
+        <div>KDV Tutarı: <span id="p_kdv"></span> TL</div>
+        <div class="pdf-grand-total">Genel Toplam: <span id="p_geneltoplam"></span> TL</div>
+    </div>
+
+    <div class="pdf-terms">
+        <strong>TİCARİ ŞARTLAR</strong><br>
+        • <strong>Teklif Geçerlilik:</strong> Bu teklif <span id="p_gecerlilik"></span> süreyle geçerlidir.<br>
+        • <strong>Teslimat:</strong> <span id="p_teslimat"></span><br>
+        • <strong>Fiyatlandırma:</strong> Kur veya maliyet değişiklikleri bildirim yapılmaksızın yansıtılabilir.
+    </div>
+
+    <div class="pdf-footer">
+        <div>
+            <strong>Firma Kaşe & İmza (Onay)</strong><br>
+            <br><br>...................................................
+        </div>
+        <div class="pdf-signature">
+            <strong>Müşteri Temsilcisi</strong><br>
+            <span id="p_danisman"></span><br>
+            İletişim: <span id="p_iletisim"></span><br>
+            <strong>FATİH AVM</strong>
+        </div>
+    </div>
 </div>
 
 <script>
-    function metinOlustur() {
-        const sirketAdi = document.getElementById('sirketAdi').value;
-        const musteriAdi = document.getElementById('musteriAdi').value;
-        const urunAdi = document.getElementById('urunAdi').value;
-        const urunGorseli = document.getElementById('urunGorseli').value;
-        const teknikDetay = document.getElementById('teknikDetay').value;
-        const listeFiyati = document.getElementById('listeFiyati').value;
-        const teklifFiyati = document.getElementById('teklifFiyati').value;
-        const gecerlilikTarihi = document.getElementById('gecerlilikTarihi').value;
-        const danismanAdi = document.getElementById('danismanAdi').value;
-        const ulasimNo = document.getElementById('ulasimNo').value;
+    // Tarihi bugünün tarihi olarak otomatik doldur
+    document.getElementById('v_tarih').valueAsDate = new Date();
 
-        // Tarih formatını gün/ay/yıl olarak düzenleme
-        let formatliTarih = "";
-        if(gecerlilikTarihi) {
-            const dateObj = new Date(gecerlilikTarihi);
-            formatliTarih = dateObj.toLocaleDateString('tr-TR');
-        }
-
-        let gorselMetni = urunGorseli ? `\nÜrün Görseli / Referansı: ${urunGorseli}\n` : "";
-
-        const teklifMetni = `${sirketAdi}
-
-Sayın ${musteriAdi},
-
-Görüşmemize istinaden talep ettiğiniz "${urunAdi}" ile ilgili teknik detaylar ve kurumunuza özel fiyatlandırma aşağıda bilgilerinize sunulmuştur.
-${gorselMetni}
---- Ürün Özellikleri ve Teknik Detaylar ---
-${teknikDetay}
-
---- Fiyatlandırma ---
-Liste Fiyatı: ${listeFiyati}
-Size Özel Teklifimiz: ${teklifFiyati}
-
-Bu teklifimiz ${formatliTarih} tarihine kadar geçerlidir.
-
-Süreçle ilgili tüm soru ve talepleriniz için aşağıdaki numaradan bana doğrudan ulaşabilirsiniz.
-
-Saygılarımla,
-
-${danismanAdi}
-Müşteri Danışmanı
-Direkt Hat: ${ulasimNo}`;
-
-        return teklifMetni;
+    // KDV ve Toplam Hesaplama Mantığı
+    function kdvHesapla() {
+        let araToplam = parseFloat(document.getElementById('v_aratoplam').value) || 0;
+        let kdvOran = parseFloat(document.getElementById('v_kdvoran').value) || 0;
+        let kdvTutar = araToplam * (kdvOran / 100);
+        let genelToplam = araToplam + kdvTutar;
+        
+        // Sayıları formatlayarak yazdır (Örn: 42.000,00)
+        document.getElementById('v_geneltoplam').value = new Intl.NumberFormat('tr-TR').format(genelToplam) + " TL";
+        return { araToplam, kdvTutar, genelToplam };
     }
 
-    function onizlemeGuncelle() {
-        const onizlemeDiv = document.getElementById('onizleme');
-        onizlemeDiv.style.display = 'block';
-        onizlemeDiv.innerText = metinOlustur();
+    // Ekrandaki verileri PDF şablonuna kopyalama işlemi
+    function verileriPdfHazirla() {
+        document.getElementById('p_tarih').innerText = document.getElementById('v_tarih').value;
+        document.getElementById('p_refno').innerText = document.getElementById('v_refno').value;
+        document.getElementById('p_musteri').innerText = document.getElementById('v_musteri').value;
+        document.getElementById('p_yetkili').innerText = document.getElementById('v_yetkili').value;
+        
+        document.getElementById('p_urun').innerText = document.getElementById('v_urun').value;
+        document.getElementById('p_detay').innerText = document.getElementById('v_detay').value;
+        
+        // Para Formatları
+        let fmt = new Intl.NumberFormat('tr-TR');
+        let liste = parseFloat(document.getElementById('v_liste').value) || 0;
+        let hesap = kdvHesapla();
+
+        document.getElementById('p_liste').innerText = fmt.format(liste);
+        document.getElementById('p_aratoplam').innerText = fmt.format(hesap.araToplam);
+        document.getElementById('p_aratoplam2').innerText = fmt.format(hesap.araToplam);
+        document.getElementById('p_kdv').innerText = fmt.format(hesap.kdvTutar);
+        document.getElementById('p_geneltoplam').innerText = fmt.format(hesap.genelToplam);
+
+        document.getElementById('p_gecerlilik').innerText = document.getElementById('v_gecerlilik').value;
+        document.getElementById('p_teslimat').innerText = document.getElementById('v_teslimat').value;
+        document.getElementById('p_danisman').innerText = document.getElementById('v_danisman').value;
+        document.getElementById('p_iletisim').innerText = document.getElementById('v_iletisim').value;
     }
 
-    function kopyala() {
-        const metin = metinOlustur();
-        navigator.clipboard.writeText(metin).then(() => {
-            alert("Teklif metni başarıyla kopyalandı. İstediğiniz yere yapıştırabilirsiniz.");
-            onizlemeGuncelle();
-        }).catch(err => {
-            alert("Kopyalama sırasında bir hata oluştu.");
+    // html2pdf Konfigürasyonu
+    function getPdfOptions(fileName) {
+        return {
+            margin:       0,
+            filename:     fileName + '.pdf',
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+    }
+
+    // Buton 1: Sadece İndir (Bilgisayar İçin Veya Klasik Yöntem)
+    function pdfIndir() {
+        verileriPdfHazirla();
+        document.getElementById('pdfTemplate').style.display = 'block'; // Çizim için görünür yap
+        
+        let musteri = document.getElementById('v_musteri').value || "Musteri";
+        let fileName = 'Teklif_' + musteri.replace(/ /g, '_');
+        
+        html2pdf().set(getPdfOptions(fileName)).from(document.getElementById('pdfTemplate')).save().then(() => {
+            document.getElementById('pdfTemplate').style.display = 'none'; // İşlem bitince tekrar gizle
         });
     }
 
-    function whatsappGonder() {
-        const metin = encodeURIComponent(metinOlustur());
-        window.open(`https://wa.me/?text=${metin}`, '_blank');
-        onizlemeGuncelle();
-    }
+    // Buton 2: Doğrudan Paylaş (WhatsApp, Mail vb. uygulamaları açar)
+    async function pdfPaylas() {
+        verileriPdfHazirla();
+        let element = document.getElementById('pdfTemplate');
+        element.style.display = 'block';
 
-    function mailGonder() {
-        const musteriAdi = document.getElementById('musteriAdi').value;
-        const urunAdi = document.getElementById('urunAdi').value;
-        const sirketAdi = document.getElementById('sirketAdi').value;
+        let musteri = document.getElementById('v_musteri').value || "Musteri";
+        let fileName = 'FatihAVM_Teklif_' + musteri.replace(/ /g, '') + '.pdf';
         
-        const konu = encodeURIComponent(`${sirketAdi} - ${urunAdi} Hakkında Fiyat Teklifi - ${musteriAdi}`);
-        const icerik = encodeURIComponent(metinOlustur());
+        let opt = getPdfOptions(fileName);
         
-        window.location.href = `mailto:?subject=${konu}&body=${icerik}`;
-        onizlemeGuncelle();
+        try {
+            // PDF'i arka planda Blob (dosya) formatına çevir
+            let pdfWorker = html2pdf().set(opt).from(element);
+            let pdfBlob = await pdfWorker.output('blob');
+            element.style.display = 'none'; // Gizle
+
+            // Dosya paylaşım destekleniyorsa
+            if (navigator.share && navigator.canShare) {
+                let file = new File([pdfBlob], fileName, { type: 'application/pdf' });
+                
+                if (navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        title: 'Teklif Dosyası',
+                        text: 'Fatih AVM - Teklif dosyanız ektedir.',
+                        files: [file]
+                    });
+                } else {
+                    alert("Cihazınız PDF dosyasını bu şekilde paylaşmayı desteklemiyor. Lütfen 'İndir' butonunu kullanın.");
+                    pdfIndir();
+                }
+            } else {
+                alert("Tarayıcınız doğrudan paylaşım (Web Share API) desteklemiyor. PDF indiriliyor...");
+                pdfIndir();
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Paylaşım sırasında bir hata oluştu.");
+            element.style.display = 'none';
+        }
     }
 </script>
 
