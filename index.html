@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kurumsal Teklif Oluşturucu</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #1a2b4c;
+        }
+        .header h1 {
+            color: #1a2b4c;
+            margin: 0;
+            font-size: 24px;
+            text-transform: uppercase;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #1a2b4c;
+            font-size: 14px;
+        }
+        input[type="text"], input[type="date"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .price-row {
+            display: flex;
+            gap: 15px;
+        }
+        .price-row .form-group {
+            flex: 1;
+        }
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #fff;
+            flex: 1;
+            font-size: 14px;
+        }
+        .btn-copy { background-color: #4a5568; }
+        .btn-wp { background-color: #2b6cb0; } /* Kurumsal Mavi */
+        .btn-mail { background-color: #2d3748; } /* Koyu Gri */
+        
+        button:hover { opacity: 0.9; }
+        
+        .output-preview {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border: 1px dashed #cbd5e0;
+            white-space: pre-wrap;
+            font-size: 14px;
+            display: none;
+        }
+        .info-text {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <!-- Şirket ismini buradan veya tarayıcıdan değiştirebilirsin -->
+        <h1><input type="text" id="sirketAdi" value="ŞİRKET İSMİ" style="text-align: center; font-size: 24px; font-weight: bold; border: none; background: transparent; color: #1a2b4c; text-transform: uppercase;"></h1>
+        <div class="info-text">Kurumsal Teklif Oluşturma Sistemi</div>
+    </div>
+
+    <form id="teklifForm">
+        <div class="form-group">
+            <label>Müşteri / Firma Adı:</label>
+            <input type="text" id="musteriAdi" placeholder="Örn: X Lojistik A.Ş.">
+        </div>
+
+        <div class="form-group">
+            <label>Ürün / Hizmet Adı:</label>
+            <input type="text" id="urunAdi" placeholder="Örn: Endüstriyel Zemin Temizleme Makinesi">
+        </div>
+
+        <div class="form-group">
+            <label>Ürün Görseli (URL Bağlantısı):</label>
+            <input type="text" id="urunGorseli" placeholder="Örn: https://www.sirketiniz.com/urun-resmi.jpg">
+            <div class="info-text">İnternet üzerindeki bir resmin bağlantısını eklerseniz, müşteri tıkladığında doğrudan görseli görür.</div>
+        </div>
+
+        <div class="form-group">
+            <label>Ürün Özellikleri ve Teknik Detaylar:</label>
+            <textarea id="teknikDetay" placeholder="Ürünün teknik spesifikasyonları, kapasitesi, avantajları ve müşteri için çözdüğü problemleri detaylıca yazın..."></textarea>
+        </div>
+
+        <div class="price-row">
+            <div class="form-group">
+                <label>Liste Fiyatı (Gerçek Fiyat):</label>
+                <input type="text" id="listeFiyati" placeholder="Örn: 120.000 TL + KDV">
+            </div>
+            <div class="form-group">
+                <label>Verilen Özel Fiyat Teklifi:</label>
+                <input type="text" id="teklifFiyati" placeholder="Örn: 95.000 TL + KDV">
+            </div>
+        </div>
+
+        <div class="price-row">
+            <div class="form-group">
+                <label>Teklif Geçerlilik Tarihi:</label>
+                <input type="date" id="gecerlilikTarihi">
+            </div>
+        </div>
+
+        <div class="price-row">
+            <div class="form-group">
+                <label>Danışman Adı:</label>
+                <input type="text" id="danismanAdi" placeholder="Adınız Soyadınız">
+            </div>
+            <div class="form-group">
+                <label>Direkt Ulaşım Numarası:</label>
+                <input type="text" id="ulasimNo" placeholder="Örn: 0555 555 55 55">
+            </div>
+        </div>
+    </form>
+
+    <div class="buttons">
+        <button class="btn-copy" onclick="kopyala()">Metni Kopyala</button>
+        <button class="btn-wp" onclick="whatsappGonder()">WhatsApp'a Gönder</button>
+        <button class="btn-mail" onclick="mailGonder()">E-Posta Olarak Aç</button>
+    </div>
+
+    <div id="onizleme" class="output-preview"></div>
+</div>
+
+<script>
+    function metinOlustur() {
+        const sirketAdi = document.getElementById('sirketAdi').value;
+        const musteriAdi = document.getElementById('musteriAdi').value;
+        const urunAdi = document.getElementById('urunAdi').value;
+        const urunGorseli = document.getElementById('urunGorseli').value;
+        const teknikDetay = document.getElementById('teknikDetay').value;
+        const listeFiyati = document.getElementById('listeFiyati').value;
+        const teklifFiyati = document.getElementById('teklifFiyati').value;
+        const gecerlilikTarihi = document.getElementById('gecerlilikTarihi').value;
+        const danismanAdi = document.getElementById('danismanAdi').value;
+        const ulasimNo = document.getElementById('ulasimNo').value;
+
+        // Tarih formatını gün/ay/yıl olarak düzenleme
+        let formatliTarih = "";
+        if(gecerlilikTarihi) {
+            const dateObj = new Date(gecerlilikTarihi);
+            formatliTarih = dateObj.toLocaleDateString('tr-TR');
+        }
+
+        let gorselMetni = urunGorseli ? `\nÜrün Görseli / Referansı: ${urunGorseli}\n` : "";
+
+        const teklifMetni = `${sirketAdi}
+
+Sayın ${musteriAdi},
+
+Görüşmemize istinaden talep ettiğiniz "${urunAdi}" ile ilgili teknik detaylar ve kurumunuza özel fiyatlandırma aşağıda bilgilerinize sunulmuştur.
+${gorselMetni}
+--- Ürün Özellikleri ve Teknik Detaylar ---
+${teknikDetay}
+
+--- Fiyatlandırma ---
+Liste Fiyatı: ${listeFiyati}
+Size Özel Teklifimiz: ${teklifFiyati}
+
+Bu teklifimiz ${formatliTarih} tarihine kadar geçerlidir.
+
+Süreçle ilgili tüm soru ve talepleriniz için aşağıdaki numaradan bana doğrudan ulaşabilirsiniz.
+
+Saygılarımla,
+
+${danismanAdi}
+Müşteri Danışmanı
+Direkt Hat: ${ulasimNo}`;
+
+        return teklifMetni;
+    }
+
+    function onizlemeGuncelle() {
+        const onizlemeDiv = document.getElementById('onizleme');
+        onizlemeDiv.style.display = 'block';
+        onizlemeDiv.innerText = metinOlustur();
+    }
+
+    function kopyala() {
+        const metin = metinOlustur();
+        navigator.clipboard.writeText(metin).then(() => {
+            alert("Teklif metni başarıyla kopyalandı. İstediğiniz yere yapıştırabilirsiniz.");
+            onizlemeGuncelle();
+        }).catch(err => {
+            alert("Kopyalama sırasında bir hata oluştu.");
+        });
+    }
+
+    function whatsappGonder() {
+        const metin = encodeURIComponent(metinOlustur());
+        window.open(`https://wa.me/?text=${metin}`, '_blank');
+        onizlemeGuncelle();
+    }
+
+    function mailGonder() {
+        const musteriAdi = document.getElementById('musteriAdi').value;
+        const urunAdi = document.getElementById('urunAdi').value;
+        const sirketAdi = document.getElementById('sirketAdi').value;
+        
+        const konu = encodeURIComponent(`${sirketAdi} - ${urunAdi} Hakkında Fiyat Teklifi - ${musteriAdi}`);
+        const icerik = encodeURIComponent(metinOlustur());
+        
+        window.location.href = `mailto:?subject=${konu}&body=${icerik}`;
+        onizlemeGuncelle();
+    }
+</script>
+
+</body>
+</html>
