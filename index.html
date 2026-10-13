@@ -59,8 +59,9 @@
 
 <div id="formArea">
     <div class="header">
-        <input type="text" id="v_sirket_adi" class="sirket-adi-input" value="FATİH AVM">
-        <div class="sirket-adi-info">Teklif Sisteminin Sahibi (Burayı değiştirirseniz evraktaki her yer değişir)</div>
+        <!-- oninput ile yazılan her harfi telefonun hafızasına kaydeder -->
+        <input type="text" id="v_sirket_adi" class="sirket-adi-input" value="FATİH AVM" oninput="localStorage.setItem('hafiza_sirket', this.value)">
+        <div class="sirket-adi-info">Teklif Sisteminin Sahibi (Burayı değiştirirseniz sistem bu ismi hep hatırlar)</div>
     </div>
 
     <div class="section-title">Müşteri & Evrak Bilgileri</div>
@@ -110,11 +111,13 @@
         </div>
         <div class="form-group">
             <label>Danışman Adı</label>
-            <input type="text" id="v_danisman" placeholder="">
+            <!-- oninput ile ismi kaydeder -->
+            <input type="text" id="v_danisman" placeholder="" oninput="localStorage.setItem('hafiza_danisman', this.value)">
         </div>
         <div class="form-group">
             <label>İletişim Numaranız</label>
-            <input type="text" id="v_iletisim" placeholder="">
+            <!-- oninput ile numarayı kaydeder -->
+            <input type="text" id="v_iletisim" placeholder="" oninput="localStorage.setItem('hafiza_iletisim', this.value)">
         </div>
     </div>
 
@@ -126,10 +129,22 @@
     let urunSayaci = 0;
 
     window.onload = function() {
+        // TARAYICI HAFIZASINI KONTROL ET VE YÜKLE
+        let kayitliSirket = localStorage.getItem('hafiza_sirket');
+        if(kayitliSirket) document.getElementById('v_sirket_adi').value = kayitliSirket;
+        
+        let kayitliDanisman = localStorage.getItem('hafiza_danisman');
+        if(kayitliDanisman) document.getElementById('v_danisman').value = kayitliDanisman;
+        
+        let kayitliIletisim = localStorage.getItem('hafiza_iletisim');
+        if(kayitliIletisim) document.getElementById('v_iletisim').value = kayitliIletisim;
+
+        // Tarihleri Doldur
         document.getElementById('v_tarih').valueAsDate = new Date();
         let fDate = new Date(); fDate.setDate(fDate.getDate() + 15);
         document.getElementById('v_gecerlilik').valueAsDate = fDate;
         
+        // Referans No Üret
         let d = new Date();
         document.getElementById('v_refno').value = "TR-" + d.getFullYear() + (d.getMonth()+1).toString().padStart(2,'0') + d.getDate().toString().padStart(2,'0') + "-" + Math.floor(1000 + Math.random() * 9000);
         
@@ -196,7 +211,6 @@
         return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : val;
     }
 
-    // YENİ VE KESİN ÇÖZÜM: Yeni Sekmede Özel Yazdırma Penceresi Oluşturma
     function pdfOlarakYazdir() {
         let v = id => document.getElementById(id).value;
         let sirket = v('v_sirket_adi');
@@ -233,19 +247,15 @@
             `;
         });
 
-        // Tamamen izole edilmiş, link ve tarih basılmasını engelleyen yeni HTML yapısı
+        // Yeni Pencerede PDF şablonunu yarat
         let printWindow = window.open('', '_blank');
         printWindow.document.write(`
             <html>
             <head>
                 <title>Fiyat Teklifi</title>
                 <style>
-                    /* Link (Header/Footer) Basılmasını Engelleyen Saf CSS Kuralları */
-                    @page { 
-                        size: A4; 
-                        margin: 0; /* Tarayıcının varsayılan marginlerini sıfırla */
-                    }
-                    /* Sayfayı PDF standartlarında ayarla */
+                    /* Link ve Tarih Basılmasını Kesin Engelleyen Saf CSS */
+                    @page { size: A4; margin: 0; }
                     body { 
                         font-family: 'Helvetica', 'Arial', sans-serif; 
                         margin: 0; 
@@ -255,10 +265,8 @@
                         -webkit-print-color-adjust: exact !important; 
                         print-color-adjust: exact !important;
                     }
-                    /* Tarayıcı eklentilerini (URL, Tarih vb.) gizlemeye zorlama */
                     @media print {
                         body { margin: 0; padding: 15mm; }
-                        /* Header ve Footer'ı tamamen sakla */
                         @page :left { @top-left { content: ""; } @bottom-left { content: ""; } }
                         @page :right { @top-right { content: ""; } @bottom-right { content: ""; } }
                     }
@@ -334,10 +342,7 @@
         printWindow.document.close();
         printWindow.focus();
         
-        // İçeriğin yüklenmesi için çok kısa bir süre bekleyip yazdır
-        setTimeout(() => {
-            printWindow.print();
-        }, 250);
+        setTimeout(() => { printWindow.print(); }, 250);
     }
 
     function whatsappYaziGonder() {
