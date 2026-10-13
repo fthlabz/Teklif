@@ -52,7 +52,10 @@
             #formArea { display: none !important; }
             #printArea { display: block !important; padding: 15mm; font-family: 'Helvetica', 'Arial', sans-serif; }
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            @page { margin: 0; size: A4; }
+            
+            /* iPhone Safari URL gizleme hilesi: Kenar boşluklarını manipüle ederek alttaki linki keser */
+            @page { margin: 0; size: A4; margin-bottom: -5mm; }
+            html { padding-bottom: 15mm; }
             
             .p-header { display: flex; justify-content: space-between; border-bottom: 3px solid #1a365d; padding-bottom: 15px; margin-bottom: 25px; }
             .p-title { font-size: 26pt; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
@@ -75,7 +78,6 @@
 </head>
 <body>
 
-<!-- SENİN GÖRDÜĞÜN FORM EKRANI -->
 <div id="formArea">
     <div class="header"><h1>FATİH AVM TEKLİF SİSTEMİ</h1></div>
 
@@ -96,9 +98,7 @@
     </div>
 
     <div class="section-title">Ürünler / Paket İçeriği</div>
-    <div id="urunlerKapsayici">
-        <!-- Dinamik ürünler buraya gelecek -->
-    </div>
+    <div id="urunlerKapsayici"></div>
     <button class="btn-ekle" onclick="urunKartiEkle()">+ Yeni Ürün Ekle</button>
 
     <div class="toplam-alani">
@@ -108,7 +108,7 @@
     <div class="section-title">Ticari Şartlar & İletişim</div>
     <div class="form-grid">
         <div class="form-group">
-            <label>Termin / Teslimat (Sadece Gün Yaz)</label>
+            <label>Termin / Teslimat (Gün)</label>
             <input type="number" id="v_termin_gun" placeholder="Örn: 7">
         </div>
         <div class="form-group">
@@ -123,7 +123,7 @@
             </select>
         </div>
         <div class="form-group">
-            <label>Teklif Geçerlilik Tarihi</label>
+            <label>Geçerlilik Tarihi</label>
             <input type="date" id="v_gecerlilik">
         </div>
         <div class="form-group">
@@ -140,9 +140,6 @@
     <button class="islem-btn btn-wp" onclick="whatsappYaziGonder()">💬 Direkt Yazı Olarak WhatsApp'a At</button>
 </div>
 
-<!-- ========================================================== -->
-<!-- PDF / YAZDIRMA ŞABLONU -->
-<!-- ========================================================== -->
 <div id="printArea">
     <div class="p-header">
         <div><h1 class="p-title">FATİH AVM</h1></div>
@@ -167,9 +164,7 @@
                 <th style="width: 20%; text-align: right;">Net Tutar</th>
             </tr>
         </thead>
-        <tbody id="p_urun_listesi">
-            <!-- Ürünler buraya JS ile dinamik çizilecek -->
-        </tbody>
+        <tbody id="p_urun_listesi"></tbody>
     </table>
 
     <div class="p-totals">
@@ -194,7 +189,6 @@
 <script>
     let urunSayaci = 0;
 
-    // Sayfa açıldığında ilk ürünü ve tarihleri ekle
     window.onload = function() {
         document.getElementById('v_tarih').valueAsDate = new Date();
         let fDate = new Date(); fDate.setDate(fDate.getDate() + 15);
@@ -203,19 +197,16 @@
         let d = new Date();
         document.getElementById('v_refno').value = "TR-" + d.getFullYear() + (d.getMonth()+1).toString().padStart(2,'0') + d.getDate().toString().padStart(2,'0') + "-" + Math.floor(1000 + Math.random() * 9000);
         
-        urunKartiEkle(); // İlk boş ürünü ekle
+        urunKartiEkle();
     };
 
-    // Dinamik Ürün Ekleme Fonksiyonu
     function urunKartiEkle() {
         urunSayaci++;
         const kapsayici = document.getElementById('urunlerKapsayici');
-        
         const kart = document.createElement('div');
         kart.className = 'urun-karti';
         kart.id = 'urun_karti_' + urunSayaci;
         
-        // Eğer 1'den fazla ürün varsa "Sil" butonu göster
         const silButonu = urunSayaci > 1 ? `<button class="urun-karti-sil" onclick="urunSil('urun_karti_${urunSayaci}')">X Sil</button>` : '';
 
         kart.innerHTML = `
@@ -223,11 +214,11 @@
             <div class="form-grid">
                 <div class="form-group full-width">
                     <label>Ürün Adı / Model</label>
-                    <input type="text" class="u_ad" placeholder="Örn: Bosch Çamaşır Makinesi WGA142X1TR">
+                    <input type="text" class="u_ad" placeholder="Örn: Bosch Çamaşır Makinesi">
                 </div>
                 <div class="form-group full-width">
                     <label>Teknik Detaylar (İsteğe Bağlı)</label>
-                    <textarea class="u_detay" placeholder="Örn: 9 KG, 1200 Devir, Leke Çıkarma..."></textarea>
+                    <textarea class="u_detay" placeholder="Örn: 9 KG, 1200 Devir..."></textarea>
                 </div>
                 <div class="form-group">
                     <label>Liste Fiyatı (Üstü Çizilir)</label>
@@ -247,7 +238,6 @@
         toplamHesapla();
     }
 
-    // Para Formatı ve Canlı Toplam Hesaplama
     function paraVeToplam(input) {
         let deger = input.value.replace(/[^0-9]/g, '');
         if (deger === '') { input.value = ''; } 
@@ -258,12 +248,10 @@
     function toplamHesapla() {
         let toplam = 0;
         let netFiyatInputs = document.querySelectorAll('.u_net');
-        
         netFiyatInputs.forEach(input => {
             let rakam = parseInt(input.value.replace(/[^0-9]/g, '')) || 0;
             toplam += rakam;
         });
-        
         document.getElementById('v_genelToplamEkran').innerText = new Intl.NumberFormat('tr-TR').format(toplam) + ' ₺';
         return toplam;
     }
@@ -274,7 +262,6 @@
         return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : val;
     }
 
-    // PDF ÖNİZLEME (VERİLERİ YAZDIRMA ŞABLONUNA AKTAR)
     function pdfOnizlemeAc() {
         let v = id => document.getElementById(id).value;
         let p = (id, val) => document.getElementById(id).innerText = val;
@@ -282,17 +269,14 @@
         p('p_tarih', formatTarih(v('v_tarih')));
         p('p_refno', v('v_refno'));
         p('p_musteri', v('v_musteri'));
-        
-        // Şartlar
         p('p_termin', v('v_termin_gun'));
         p('p_odeme', v('v_odeme'));
         p('p_gecerlilik', formatTarih(v('v_gecerlilik')));
         p('p_danisman', v('v_danisman'));
         p('p_iletisim', v('v_iletisim'));
 
-        // Ürün Listesini Çiz
         let listeBody = document.getElementById('p_urun_listesi');
-        listeBody.innerHTML = ''; // Önce temizle
+        listeBody.innerHTML = '';
         
         let urunKartlari = document.querySelectorAll('.urun-karti');
         urunKartlari.forEach(kart => {
@@ -300,8 +284,6 @@
             let detay = kart.querySelector('.u_detay').value.replace(/\n/g, '<br>');
             let listeFiyati = kart.querySelector('.u_liste').value;
             let netFiyati = kart.querySelector('.u_net').value;
-            
-            // Eğer liste fiyatı varsa üstünü çizerek göster
             let listeHtml = listeFiyati ? `<br><del style="font-size:8pt; color:#a0aec0;">${listeFiyati}</del>` : '';
             
             let tr = document.createElement('tr');
@@ -316,20 +298,16 @@
             listeBody.appendChild(tr);
         });
 
-        // Toplam Fiyat
-        let genelToplam = document.getElementById('v_genelToplamEkran').innerText;
-        p('p_toplam', genelToplam);
-
-        // Pencereyi Yazdır
+        p('p_toplam', document.getElementById('v_genelToplamEkran').innerText);
         window.print();
     }
 
-    // WHATSAPP'A GÖNDER
     function whatsappYaziGonder() {
         let v = id => document.getElementById(id).value;
         
+        // WhatsApp Yazı Metni (Tüm PDF detaylarını içerir)
         let metin = `*FATİH AVM - KURUMSAL FİYAT TEKLİFİ*\n\n`;
-        metin += `Sayın ${v('v_musteri')},\nGörüşmemize istinaden talep ettiğiniz ürün teklifleri aşağıdadır:\n\n`;
+        metin += `Sayın ${v('v_musteri')},\nMağazamızda yapmış olduğunuz görüşmelere istinaden, talep etmiş olduğunuz ürünlere ait kurumsal fiyat teklifi aşağıda bilgilerinize sunulmuştur.\n\n`;
         
         let urunKartlari = document.querySelectorAll('.urun-karti');
         urunKartlari.forEach((kart, index) => {
@@ -338,8 +316,8 @@
             let netFiyati = kart.querySelector('.u_net').value;
             
             metin += `*${index + 1}. Ürün:* ${ad}\n`;
-            if(detay) metin += `_Detay: ${detay}_\n`;
-            metin += `*Fiyat:* ${netFiyati}\n\n`;
+            if(detay) metin += `_Teknik Detay: ${detay}_\n`;
+            metin += `*Net Tutar:* ${netFiyati}\n\n`;
         });
         
         let genelToplam = document.getElementById('v_genelToplamEkran').innerText;
@@ -347,17 +325,22 @@
         metin += `*GENEL TOPLAM: ${genelToplam}*\n`;
         metin += `------------------------\n\n`;
         
-        metin += `*Şartlar:*\n`;
-        metin += `- Termin: Sipariş onayı sonrası ${v('v_termin_gun')} iş günü.\n`;
-        metin += `- Ödeme: ${v('v_odeme')}\n`;
-        metin += `- Teslimat/Kurulum: Firmamıza aittir.\n\n`;
+        metin += `*TİCARİ BİLGİLENDİRME VE ŞARTLAR*\n`;
+        metin += `• *Termin Süresi:* Sipariş onayı ve peşinat işlemlerine müteakip ${v('v_termin_gun')} iş günü içerisinde teslim edilecektir.\n`;
+        metin += `• *Ödeme Şekli:* ${v('v_odeme')}\n`;
+        metin += `• *Teslimat ve Kurulum:* Nakliye ve kurulum masrafları satıcı firmaya (FATİH AVM) aittir. Ürün montajları yetkili servis güvencesiyle yapılacaktır.\n`;
+        metin += `• *Garanti:* Tüm ürünler distribütör/marka yetkili servis garantisi altındadır.\n`;
+        metin += `• *Kur ve Geçerlilik:* Bu teklif ${formatTarih(v('v_gecerlilik'))} tarihine kadar geçerlidir. Fiyatlara KDV dahildir.\n\n`;
         
-        metin += `Tüm sorularınız için bana ulaşabilirsiniz.\n`;
-        metin += `*${v('v_danisman')}* - Fatih AVM\nİletişim: ${v('v_iletisim')}`;
+        metin += `*KVKK ve YASAL AYDINLATMA METNİ:*\n`;
+        metin += `_İşbu teklif belgesi, yalnızca bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımamaktadır. İletişim bilgileriniz, KVKK kapsamında FATİH AVM tarafından müşteri ilişkileri süreçleri dahilinde işlenmektedir._\n\n`;
+
+        metin += `*Müşteri Temsilcisi:* ${v('v_danisman')}\n`;
+        metin += `*İletişim:* ${v('v_iletisim')}\n`;
+        metin += `*Teklif No:* ${v('v_refno')}`;
 
         window.open(`https://wa.me/?text=${encodeURIComponent(metin)}`, '_blank');
     }
 </script>
-
 </body>
 </html>
