@@ -4,64 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Kurumsal Teklif Sistemi</title>
-    <!-- PDF Oluşturma Kütüphanesi -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* =========================================
-           EKRAN GÖRÜNÜMÜ (KOYU MOD FORM)
+           GENEL AYARLAR
            ========================================= */
         :root {
             --bg-color: #121212; --surface-color: #1e1e1e;
             --primary-color: #3b82f6; --text-main: #e0e0e0;
             --text-muted: #9e9e9e; --border-color: #333333;
         }
-        
         body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 10px; box-sizing: border-box; overflow-x: hidden; }
         
-        #formArea { width: 100%; max-width: 100%; margin: 0 auto; background-color: var(--surface-color); padding: 15px; box-sizing: border-box; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow-x: hidden; }
-        
-        .header { border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box; }
-        
+        /* =========================================
+           FORM EKRANI
+           ========================================= */
+        #formArea { width: 100%; max-width: 900px; margin: 0 auto; background-color: var(--surface-color); padding: 15px; box-sizing: border-box; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+        .header { border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; }
         .sirket-adi-input { background: transparent; border: 1px dashed var(--primary-color); color: #ffffff; font-size: 24px; font-weight: bold; text-align: center; padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; margin-bottom: 5px; }
         .sirket-adi-input:focus { outline: none; border: 1px solid var(--primary-color); background-color: #2c2c2c; }
         .sirket-adi-info { font-size: 11px; color: var(--text-muted); text-align: center; }
-
-        .section-title { font-size: 16px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 30px; margin-bottom: 15px; text-transform: uppercase; width: 100%; box-sizing: border-box; }
-        
-        .form-grid { display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box; }
-        
-        .form-group { display: flex; flex-direction: column; width: 100%; box-sizing: border-box; }
+        .section-title { font-size: 16px; color: var(--primary-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; margin-top: 30px; margin-bottom: 15px; text-transform: uppercase; }
+        .form-grid { display: flex; flex-direction: column; gap: 10px; }
+        .form-group { display: flex; flex-direction: column; width: 100%; }
         label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
-        
         input, textarea, select { width: 100%; box-sizing: border-box; background-color: #2c2c2c; border: 1px solid var(--border-color); color: #ffffff; padding: 12px; border-radius: 8px; font-size: 16px; font-family: inherit; margin: 0; }
-        
-        input[type="date"] {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            display: block;
-            min-height: 44px;
-        }
-        
+        input[type="date"] { -webkit-appearance: none; display: block; min-height: 44px; }
         input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary-color); }
         input[readonly] { background-color: #1a1a1a; color: #4ade80; font-weight: bold; border: none; }
-        
-        .urun-karti { background-color: #242424; border: 1px solid #444; padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; }
+        .urun-karti { background-color: #242424; border: 1px solid #444; padding: 15px; border-radius: 8px; margin-bottom: 15px; position: relative; display: flex; flex-direction: column; gap: 10px; }
         .urun-karti-sil { position: absolute; top: 10px; right: 10px; background: #e53e3e; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; z-index: 10;}
-        .btn-ekle { background-color: #4a5568; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 20px; font-size: 15px; box-sizing: border-box; }
-        
-        .toplam-alani { background-color: #1a1a1a; border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; text-align: right; font-size: 18px; color: #4ade80; font-weight: bold; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
-
-        .btn-pdf { background-color: #e53e3e; color: white; }
+        .btn-ekle { background-color: #4a5568; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 20px; font-size: 15px; }
+        .toplam-alani { background-color: #1a1a1a; border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; text-align: right; font-size: 18px; color: #4ade80; font-weight: bold; margin-bottom: 20px; }
+        .btn-pdf { background-color: #3b82f6; color: white; }
         .btn-wp { background-color: #25D366; color: white; }
-        button.islem-btn { padding: 15px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; transition: opacity 0.2s; box-sizing: border-box; }
-        button.islem-btn:active { transform: scale(0.98); }
+        button.islem-btn { padding: 15px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; }
+
+        /* =========================================
+           TEMİZ EKRAN GÖRÜNTÜSÜ (PREVIEW) MODU
+           ========================================= */
+        #previewArea { display: none; background-color: white; color: black; position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh; padding: 20px; box-sizing: border-box; z-index: 9999; }
+        .pr-header { display: flex; justify-content: space-between; border-bottom: 2px solid #1a365d; padding-bottom: 10px; margin-bottom: 15px; align-items: flex-end; }
+        .pr-title { font-size: 20px; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase; }
+        .pr-meta { text-align: right; font-size: 11px; color: #4a5568; line-height: 1.4; }
+        .pr-client { font-size: 13px; margin-bottom: 15px; line-height: 1.4; color: #2d3748; }
+        .pr-h2 { text-align: center; font-size: 16px; font-weight: bold; color: #1a365d; margin-bottom: 10px; }
         
-        /* Yükleniyor Göstergesi */
-        #yukleniyor { display: none; text-align: center; color: #4ade80; font-weight: bold; margin-top: 15px; font-size: 16px; }
+        .pr-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px; }
+        .pr-table th, .pr-table td { border: 1px solid #cbd5e0; padding: 6px; text-align: left; vertical-align: middle; }
+        .pr-table th { background-color: #1a365d; color: white; font-weight: bold; }
+        .pr-totals { text-align: right; font-size: 16px; font-weight: 900; color: #e53e3e; margin-bottom: 20px; }
+        
+        .pr-terms { background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 10px; font-size: 11px; border-left: 3px solid #1a365d; line-height: 1.5; color: #2d3748; }
+        .pr-legal { font-size: 9px; color: #718096; text-align: justify; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.3; }
+        
+        .btn-kapat { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #e53e3e; color: white; padding: 12px 25px; border: none; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10000; font-size: 14px; }
     </style>
 </head>
 <body>
 
+<!-- FORM EKRANI -->
 <div id="formArea">
     <div class="header">
         <input type="text" id="v_sirket_adi" class="sirket-adi-input" value="FATİH AVM" oninput="localStorage.setItem('hafiza_sirket', this.value)">
@@ -123,10 +124,56 @@
         </div>
     </div>
 
-    <button class="islem-btn btn-pdf" id="btnPdfUret" onclick="direktPdfIndir()">📄 PDF Dosyasını İndir</button>
-    <div id="yukleniyor">PDF Oluşturuluyor, lütfen bekleyin...</div>
-    
+    <button class="islem-btn btn-pdf" onclick="temizGorunumeGec()">📱 Teklif Görünümüne Geç (Ekran Görüntüsü İçin)</button>
     <button class="islem-btn btn-wp" onclick="whatsappYaziGonder()">💬 Direkt Yazı Olarak WhatsApp'a At</button>
+</div>
+
+<!-- EKRAN GÖRÜNTÜSÜ ALINACAK TEMİZ ALAN -->
+<div id="previewArea">
+    <div class="pr-header">
+        <div><h1 class="pr-title" id="pr_sirket"></h1></div>
+        <div class="pr-meta">
+            Tarih: <span id="pr_tarih"></span><br>
+            Teklif No: <strong id="pr_refno"></strong>
+        </div>
+    </div>
+
+    <div class="pr-client">
+        <strong>Sayın,</strong> <span id="pr_musteri"></span><br>
+        Mağazamızda yapmış olduğunuz görüşmelere istinaden kurumsal fiyat teklifi aşağıda sunulmuştur. Bizi tercih ettiğiniz için teşekkür ederiz.
+    </div>
+
+    <div class="pr-h2">FİYAT TEKLİFİ</div>
+
+    <table class="pr-table">
+        <thead>
+            <tr>
+                <th style="width: 45%">Ürün & Model</th>
+                <th style="width: 35%">Detaylar</th>
+                <th style="width: 20%; text-align: right;">Net Tutar</th>
+            </tr>
+        </thead>
+        <tbody id="pr_urunler"></tbody>
+    </table>
+
+    <div class="pr-totals">
+        Genel Toplam: <span id="pr_toplam"></span>
+    </div>
+
+    <div class="pr-terms">
+        <strong>TİCARİ ŞARTLAR</strong><br>
+        • <strong>Termin:</strong> Sipariş onayına müteakip <strong><span id="pr_termin"></span> iş günü</strong> içerisinde teslim edilecektir.<br>
+        • <strong>Ödeme:</strong> <span id="pr_odeme"></span><br>
+        • <strong>Teslimat:</strong> Nakliye/kurulum satıcı firmaya aittir. Ürünler yetkili servis güvencesindedir.<br>
+        • <strong>Geçerlilik:</strong> Bu teklif <strong><span id="pr_gecerlilik"></span></strong> tarihine kadar geçerlidir.<br><br>
+        <strong>Müşteri Temsilcisi:</strong> <span id="pr_danisman"></span> | <strong>İletişim:</strong> <span id="pr_iletisim"></span>
+    </div>
+
+    <div class="pr-legal">
+        <strong>YASAL AYDINLATMA:</strong> İşbu teklif bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımaz. Fiyatlarda stok durumuna göre değişiklik yapma hakkı satıcıda saklıdır.
+    </div>
+
+    <button class="btn-kapat" onclick="formEkraninaDon()">Kapat ve Forma Dön</button>
 </div>
 
 <script>
@@ -135,10 +182,8 @@
     window.onload = function() {
         let kayitliSirket = localStorage.getItem('hafiza_sirket');
         if(kayitliSirket) document.getElementById('v_sirket_adi').value = kayitliSirket;
-        
         let kayitliDanisman = localStorage.getItem('hafiza_danisman');
         if(kayitliDanisman) document.getElementById('v_danisman').value = kayitliDanisman;
-        
         let kayitliIletisim = localStorage.getItem('hafiza_iletisim');
         if(kayitliIletisim) document.getElementById('v_iletisim').value = kayitliIletisim;
 
@@ -183,10 +228,7 @@
         kapsayici.appendChild(kart);
     }
 
-    function urunSil(kartId) {
-        document.getElementById(kartId).remove();
-        toplamHesapla();
-    }
+    function urunSil(kartId) { document.getElementById(kartId).remove(); toplamHesapla(); }
 
     function paraVeToplam(input) {
         let deger = input.value.replace(/[^0-9]/g, '');
@@ -203,7 +245,6 @@
             toplam += rakam;
         });
         document.getElementById('v_genelToplamEkran').innerText = new Intl.NumberFormat('tr-TR').format(toplam) + ' ₺';
-        return toplam;
     }
 
     function formatTarih(val) {
@@ -212,115 +253,56 @@
         return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : val;
     }
 
-    // Doğrudan Arka Planda PDF Oluşturup İndiren Fonksiyon
-    function direktPdfIndir() {
-        document.getElementById('btnPdfUret').style.display = 'none';
-        document.getElementById('yukleniyor').style.display = 'block';
-
+    /* == TEMİZ EKRANA GEÇİŞ KODLARI == */
+    function temizGorunumeGec() {
         let v = id => document.getElementById(id).value;
-        let sirket = v('v_sirket_adi') || 'ŞİRKET ADI';
-        let musteri = v('v_musteri') || 'Müşteri';
-        let genelToplam = document.getElementById('v_genelToplamEkran').innerText;
+        let p = (id, val) => document.getElementById(id).innerText = val;
 
-        let urunListesiHtml = '';
+        p('pr_sirket', v('v_sirket_adi') || 'ŞİRKET ADI');
+        p('pr_tarih', formatTarih(v('v_tarih')));
+        p('pr_refno', v('v_refno'));
+        p('pr_musteri', v('v_musteri') || 'Değerli Müşterimiz');
+        p('pr_termin', v('v_termin_gun'));
+        p('pr_odeme', v('v_odeme'));
+        p('pr_gecerlilik', formatTarih(v('v_gecerlilik')));
+        p('pr_danisman', v('v_danisman'));
+        p('pr_iletisim', v('v_iletisim'));
+        p('pr_toplam', document.getElementById('v_genelToplamEkran').innerText);
+
+        let listeBody = document.getElementById('pr_urunler');
+        listeBody.innerHTML = '';
+        
         let urunKartlari = document.querySelectorAll('.urun-karti');
         urunKartlari.forEach(kart => {
             let ad = kart.querySelector('.u_ad').value;
             let detay = kart.querySelector('.u_detay').value.replace(/\n/g, '<br>');
             let listeFiyati = kart.querySelector('.u_liste').value;
             let netFiyati = kart.querySelector('.u_net').value;
-            let listeHtml = listeFiyati ? `<br><del style="font-size:8pt; color:#a0aec0;">${listeFiyati}</del>` : '';
+            let listeHtml = listeFiyati ? `<br><del style="font-size:9px; color:#a0aec0;">${listeFiyati}</del>` : '';
             
-            urunListesiHtml += `
-                <tr>
-                    <td style="border: 1px solid #cbd5e0; padding: 10px;"><strong>${ad}</strong></td>
-                    <td style="border: 1px solid #cbd5e0; padding: 10px;"><span style="font-size: 8.5pt; color: #4a5568;">${detay}</span></td>
-                    <td style="border: 1px solid #cbd5e0; padding: 10px; text-align: right; vertical-align: middle;">
-                        ${listeHtml}
-                        <div style="font-size:11pt; font-weight:bold;">${netFiyati}</div>
-                    </td>
-                </tr>
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${ad}</strong></td>
+                <td><span style="font-size: 11px; color: #4a5568;">${detay}</span></td>
+                <td style="text-align: right;">
+                    ${listeHtml}
+                    <div style="font-size:13px; font-weight:bold;">${netFiyati}</div>
+                </td>
             `;
+            listeBody.appendChild(tr);
         });
 
-        // Arka planda geçici bir HTML elementi oluşturuluyor
-        let tempDiv = document.createElement('div');
-        tempDiv.style.width = '800px';
-        tempDiv.style.padding = '30px';
-        tempDiv.style.backgroundColor = '#ffffff';
-        tempDiv.style.color = '#000000';
-        tempDiv.style.fontFamily = 'Arial, sans-serif';
-        tempDiv.style.position = 'absolute';
-        tempDiv.style.top = '-9999px'; // Ekranda görünmemesi için dışarı atılıyor
-        
-        tempDiv.innerHTML = `
-            <div style="display: flex; justify-content: space-between; border-bottom: 3px solid #1a365d; padding-bottom: 15px; margin-bottom: 25px; align-items: flex-end;">
-                <div><h1 style="font-size: 24pt; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase;">${sirket}</h1></div>
-                <div style="text-align: right; font-size: 10pt; color: #4a5568; line-height: 1.5;">
-                    Tarih: <span>${formatTarih(v('v_tarih'))}</span><br>
-                    Teklif No: <strong>${v('v_refno')}</strong>
-                </div>
-            </div>
-
-            <div style="font-size: 11pt; margin-bottom: 20px; line-height: 1.5;">
-                <strong>Sayın,</strong> <span>${v('v_musteri')}</span><br><br>
-                Mağazamızda yapmış olduğunuz görüşmelere istinaden, talep etmiş olduğunuz ürünlere ait kurumsal fiyat teklifi aşağıda bilgilerinize sunulmuştur. Bizi tercih ettiğiniz için teşekkür ederiz.
-            </div>
-
-            <div style="text-align: center; font-size: 14pt; font-weight: bold; color: #1a365d; margin-bottom: 15px;">FİYAT TEKLİFİ</div>
-
-            <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
-                <thead>
-                    <tr>
-                        <th style="width: 45%; border: 1px solid #cbd5e0; padding: 10px; text-align: left; background-color: #1a365d; color: white;">Ürün & Model Açıklaması</th>
-                        <th style="width: 35%; border: 1px solid #cbd5e0; padding: 10px; text-align: left; background-color: #1a365d; color: white;">Teknik Detaylar / İçerik</th>
-                        <th style="width: 20%; border: 1px solid #cbd5e0; padding: 10px; text-align: right; background-color: #1a365d; color: white;">Net Tutar</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${urunListesiHtml}
-                </tbody>
-            </table>
-
-            <div style="text-align: right; font-size: 14pt; font-weight: 900; color: #e53e3e; margin-bottom: 25px;">
-                Genel Toplam: <span>${genelToplam}</span>
-            </div>
-
-            <div style="background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 15px; font-size: 9.5pt; border-left: 4px solid #1a365d; line-height: 1.6;">
-                <strong>TİCARİ BİLGİLENDİRME VE ŞARTLAR</strong><br>
-                • <strong>Termin Süresi:</strong> Sipariş onayı ve peşinat işlemlerine müteakip <strong><span>${v('v_termin_gun')}</span> iş günü</strong> içerisinde teslim edilecektir.<br>
-                • <strong>Ödeme Şekli:</strong> <span>${v('v_odeme')}</span><br>
-                • <strong>Teslimat ve Kurulum:</strong> Nakliye ve kurulum masrafları satıcı firmaya (${sirket}) aittir. Ürün montajları yetkili servis güvencesiyle yapılacaktır.<br>
-                • <strong>Garanti:</strong> Tüm ürünler distribütör/marka yetkili servis garantisi altındadır.<br>
-                • <strong>Kur ve Geçerlilik:</strong> Bu teklif <strong><span>${formatTarih(v('v_gecerlilik'))}</span></strong> tarihine kadar geçerlidir. Fiyatlara KDV dahildir. Olası kur/enflasyon dalgalanmalarında değişiklik hakkı saklıdır.<br><br>
-                <strong>Müşteri Temsilcisi:</strong> <span>${v('v_danisman')}</span> | <strong>İletişim:</strong> <span>${v('v_iletisim')}</span>
-            </div>
-
-            <div style="font-size: 7.5pt; color: #718096; text-align: justify; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.4;">
-                <strong>KVKK ve YASAL AYDINLATMA METNİ:</strong> İşbu teklif belgesi, yalnızca bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımamaktadır. Fiyatlarda stok durumuna göre değişiklik yapma hakkı ${sirket}'de saklıdır. Müşteri, işbu teklifin hazırlanması ve kendisine iletilmesi amacıyla kendi açık rızası ile beyan ettiği iletişim bilgilerinin, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında ${sirket} tarafından müşteri ilişkileri yönetimi ve bilgilendirme süreçleri dahilinde işlenmesini, saklanmasını ve bu iletişim kanalları üzerinden kendisine ulaşılmasını kabul ve beyan eder.
-            </div>
-        `;
-
-        document.body.appendChild(tempDiv);
-
-        let dosyaAdi = musteri.replace(/\s+/g, '_') + '_Teklif.pdf';
-
-        var opt = {
-            margin:       10,
-            filename:     dosyaAdi,
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        // Kütüphane PDF'i oluşturup indirmeyi başlatıyor
-        html2pdf().set(opt).from(tempDiv).save().then(function() {
-            document.body.removeChild(tempDiv);
-            document.getElementById('btnPdfUret').style.display = 'block';
-            document.getElementById('yukleniyor').style.display = 'none';
-        });
+        document.getElementById('formArea').style.display = 'none';
+        document.getElementById('previewArea').style.display = 'block';
+        window.scrollTo(0, 0); // Sayfanın en üstüne kaydır
     }
 
+    function formEkraninaDon() {
+        document.getElementById('previewArea').style.display = 'none';
+        document.getElementById('formArea').style.display = 'block';
+    }
+
+    /* == WHATSAPP METNİ GÖNDERİMİ == */
     function whatsappYaziGonder() {
         let v = id => document.getElementById(id).value;
         let sirket = v('v_sirket_adi');
@@ -345,15 +327,11 @@
         metin += `------------------------\n\n`;
         
         metin += `*TİCARİ BİLGİLENDİRME VE ŞARTLAR*\n`;
-        metin += `• *Termin Süresi:* Sipariş onayı ve peşinat işlemlerine müteakip ${v('v_termin_gun')} iş günü içerisinde teslim edilecektir.\n`;
+        metin += `• *Termin Süresi:* Sipariş onayına müteakip ${v('v_termin_gun')} iş günü içerisinde teslim edilecektir.\n`;
         metin += `• *Ödeme Şekli:* ${v('v_odeme')}\n`;
-        metin += `• *Teslimat ve Kurulum:* Nakliye ve kurulum masrafları satıcı firmaya (${sirket}) aittir. Ürün montajları yetkili servis güvencesiyle yapılacaktır.\n`;
-        metin += `• *Garanti:* Tüm ürünler distribütör/marka yetkili servis garantisi altındadır.\n`;
-        metin += `• *Kur ve Geçerlilik:* Bu teklif ${formatTarih(v('v_gecerlilik'))} tarihine kadar geçerlidir. Fiyatlara KDV dahildir.\n\n`;
+        metin += `• *Teslimat ve Kurulum:* Nakliye ve kurulum satıcı firmaya (${sirket}) aittir.\n`;
+        metin += `• *Geçerlilik:* Bu teklif ${formatTarih(v('v_gecerlilik'))} tarihine kadar geçerlidir.\n\n`;
         
-        metin += `*KVKK ve YASAL AYDINLATMA METNİ:*\n`;
-        metin += `_İşbu teklif belgesi, yalnızca bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımamaktadır. İletişim bilgileriniz, KVKK kapsamında ${sirket} tarafından müşteri ilişkileri süreçleri dahilinde işlenmektedir._\n\n`;
-
         metin += `*Müşteri Temsilcisi:* ${v('v_danisman')}\n`;
         metin += `*İletişim:* ${v('v_iletisim')}\n`;
         metin += `*Teklif No:* ${v('v_refno')}`;
