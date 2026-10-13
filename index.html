@@ -16,12 +16,10 @@
         
         body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 10px; box-sizing: border-box; overflow-x: hidden; }
         
-        /* Ekranı tam doldurması ve taşmayı önlemesi için width ve max-width ayarlandı */
         #formArea { width: 100%; max-width: 100%; margin: 0 auto; background-color: var(--surface-color); padding: 15px; box-sizing: border-box; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); overflow-x: hidden; }
         
         .header { border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; width: 100%; box-sizing: border-box; }
         
-        /* Şirket Adı Giriş Alanı (Merkezi Kontrol) */
         .sirket-adi-input { background: transparent; border: 1px dashed var(--primary-color); color: #ffffff; font-size: 24px; font-weight: bold; text-align: center; padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; margin-bottom: 5px; }
         .sirket-adi-input:focus { outline: none; border: 1px solid var(--primary-color); background-color: #2c2c2c; }
         .sirket-adi-info { font-size: 11px; color: var(--text-muted); text-align: center; }
@@ -33,15 +31,13 @@
         .form-group { display: flex; flex-direction: column; width: 100%; box-sizing: border-box; }
         label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
         
-        /* Kutular okunaklılık için büyütüldü ve ekranı taşırmaması için width %100 yapıldı */
         input, textarea, select { width: 100%; box-sizing: border-box; background-color: #2c2c2c; border: 1px solid var(--border-color); color: #ffffff; padding: 12px; border-radius: 8px; font-size: 16px; font-family: inherit; margin: 0; }
         
-        /* Tarih inputları için özel düzeltme, margin ve padding sorunlarını çözer */
         input[type="date"] {
             -webkit-appearance: none;
             -moz-appearance: none;
             display: block;
-            min-height: 44px; /* iOS'ta tutarlı yükseklik */
+            min-height: 44px;
         }
         
         input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary-color); }
@@ -57,45 +53,13 @@
         .btn-wp { background-color: #25D366; color: white; }
         button.islem-btn { padding: 15px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; transition: opacity 0.2s; box-sizing: border-box; }
         button.islem-btn:active { transform: scale(0.98); }
-
-        /* =========================================
-           BASKI / PDF GÖRÜNÜMÜ
-           ========================================= */
-        #printArea { display: none; }
-
-        @media print {
-            body { background-color: white !important; color: black !important; padding: 0; margin: 0; overflow-x: visible; }
-            #formArea { display: none !important; }
-            #printArea { display: block !important; padding: 15mm; font-family: 'Helvetica', 'Arial', sans-serif; }
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            
-            @page { margin: 0; size: A4; margin-bottom: -5mm; }
-            html { padding-bottom: 15mm; }
-            
-            .p-header { display: flex; justify-content: space-between; border-bottom: 3px solid #1a365d; padding-bottom: 15px; margin-bottom: 25px; }
-            .p-title { font-size: 26pt; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
-            .p-meta { text-align: right; font-size: 10pt; color: #4a5568; line-height: 1.5; }
-            
-            .p-client-box { font-size: 11pt; margin-bottom: 20px; line-height: 1.5; }
-            
-            .p-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-            .p-table th, .p-table td { border: 1px solid #cbd5e0; padding: 10px; text-align: left; vertical-align: top; }
-            .p-table th { background-color: #1a365d; color: white; font-weight: bold; font-size: 10pt; }
-            .p-table td { font-size: 10pt; }
-            
-            .p-totals { text-align: right; font-size: 14pt; font-weight: 900; color: #e53e3e; margin-bottom: 25px; padding-right: 5px; }
-            
-            .p-terms { background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 15px; font-size: 9.5pt; border-left: 4px solid #1a365d; line-height: 1.6; }
-            
-            .p-legal { font-size: 7pt; color: #718096; text-align: justify; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.4; }
-        }
     </style>
 </head>
 <body>
 
 <div id="formArea">
     <div class="header">
-        <input type="text" id="v_sirket_adi" class="sirket-adi-input" value="FATİH AVM" oninput="sirketAdiniGuncelle(this.value)">
+        <input type="text" id="v_sirket_adi" class="sirket-adi-input" value="FATİH AVM">
         <div class="sirket-adi-info">Teklif Sisteminin Sahibi (Burayı değiştirirseniz evraktaki her yer değişir)</div>
     </div>
 
@@ -154,66 +118,12 @@
         </div>
     </div>
 
-    <button class="islem-btn btn-pdf" onclick="pdfOnizlemeAc()">📄 PDF Ekranını Aç (Önizle ve Yazdır)</button>
+    <button class="islem-btn btn-pdf" onclick="pdfOlarakYazdir()">📄 PDF Ekranını Aç (Önizle ve Yazdır)</button>
     <button class="islem-btn btn-wp" onclick="whatsappYaziGonder()">💬 Direkt Yazı Olarak WhatsApp'a At</button>
-</div>
-
-<div id="printArea">
-    <div class="p-header">
-        <div><h1 class="p-title sirket-baslik">FATİH AVM</h1></div>
-        <div class="p-meta">
-            Tarih: <span id="p_tarih"></span><br>
-            Teklif No: <strong id="p_refno"></strong>
-        </div>
-    </div>
-
-    <div class="p-client-box">
-        <strong>Sayın,</strong> <span id="p_musteri"></span><br><br>
-        Mağazamızda yapmış olduğunuz görüşmelere istinaden, talep etmiş olduğunuz ürünlere ait kurumsal fiyat teklifi aşağıda bilgilerinize sunulmuştur. Bizi tercih ettiğiniz için teşekkür ederiz.
-    </div>
-
-    <div style="text-align: center; font-size: 14pt; font-weight: bold; color: #1a365d; margin-bottom: 10px;">FİYAT TEKLİFİ</div>
-
-    <table class="p-table">
-        <thead>
-            <tr>
-                <th style="width: 50%">Ürün & Model Açıklaması</th>
-                <th style="width: 30%">Teknik Detaylar / İçerik</th>
-                <th style="width: 20%; text-align: right;">Net Tutar</th>
-            </tr>
-        </thead>
-        <tbody id="p_urun_listesi"></tbody>
-    </table>
-
-    <div class="p-totals">
-        Genel Toplam: <span id="p_toplam"></span>
-    </div>
-
-    <div class="p-terms">
-        <strong>TİCARİ BİLGİLENDİRME VE ŞARTLAR</strong><br>
-        • <strong>Termin Süresi:</strong> Sipariş onayı ve peşinat işlemlerine müteakip <strong><span id="p_termin"></span> iş günü</strong> içerisinde teslim edilecektir.<br>
-        • <strong>Ödeme Şekli:</strong> <span id="p_odeme"></span><br>
-        • <strong>Teslimat ve Kurulum:</strong> Nakliye ve kurulum masrafları satıcı firmaya (<span class="sirket-metin-ici">FATİH AVM</span>) aittir. Ürün montajları yetkili servis güvencesiyle yapılacaktır.<br>
-        • <strong>Garanti:</strong> Tüm ürünler distribütör/marka yetkili servis garantisi altındadır.<br>
-        • <strong>Kur ve Geçerlilik:</strong> Bu teklif <strong><span id="p_gecerlilik"></span></strong> tarihine kadar geçerlidir. Fiyatlara KDV dahildir. Olası kur/enflasyon dalgalanmalarında değişiklik hakkı saklıdır.<br><br>
-        <strong>Müşteri Temsilcisi:</strong> <span id="p_danisman"></span> | <strong>İletişim:</strong> <span id="p_iletisim"></span>
-    </div>
-
-    <div class="p-legal">
-        <strong>KVKK ve YASAL AYDINLATMA METNİ:</strong> İşbu teklif belgesi, yalnızca bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımamaktadır. Fiyatlarda stok durumuna göre değişiklik yapma hakkı <span class="sirket-yasal">FATİH AVM</span>'de saklıdır. Müşteri, işbu teklifin hazırlanması ve kendisine iletilmesi amacıyla kendi açık rızası ile beyan ettiği iletişim bilgilerinin, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında <span class="sirket-yasal2">FATİH AVM</span> tarafından müşteri ilişkileri yönetimi ve bilgilendirme süreçleri dahilinde işlenmesini, saklanmasını ve bu iletişim kanalları üzerinden kendisine ulaşılmasını kabul ve beyan eder.
-    </div>
 </div>
 
 <script>
     let urunSayaci = 0;
-    
-    function sirketAdiniGuncelle(yeniAd) {
-        if(yeniAd.trim() === '') yeniAd = 'ŞİRKET ADI';
-        document.querySelector('.sirket-baslik').innerText = yeniAd;
-        document.querySelector('.sirket-metin-ici').innerText = yeniAd;
-        document.querySelector('.sirket-yasal').innerText = yeniAd;
-        document.querySelector('.sirket-yasal2').innerText = yeniAd;
-    }
 
     window.onload = function() {
         document.getElementById('v_tarih').valueAsDate = new Date();
@@ -224,7 +134,6 @@
         document.getElementById('v_refno').value = "TR-" + d.getFullYear() + (d.getMonth()+1).toString().padStart(2,'0') + d.getDate().toString().padStart(2,'0') + "-" + Math.floor(1000 + Math.random() * 9000);
         
         urunKartiEkle();
-        sirketAdiniGuncelle(document.getElementById('v_sirket_adi').value);
     };
 
     function urunKartiEkle() {
@@ -287,22 +196,23 @@
         return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : val;
     }
 
-    function pdfOnizlemeAc() {
+    // YENİ VE KESİN ÇÖZÜM: Yeni Sekmede Özel Yazdırma Penceresi Oluşturma
+    function pdfOlarakYazdir() {
         let v = id => document.getElementById(id).value;
-        let p = (id, val) => document.getElementById(id).innerText = val;
-
-        p('p_tarih', formatTarih(v('v_tarih')));
-        p('p_refno', v('v_refno'));
-        p('p_musteri', v('v_musteri'));
-        p('p_termin', v('v_termin_gun'));
-        p('p_odeme', v('v_odeme'));
-        p('p_gecerlilik', formatTarih(v('v_gecerlilik')));
-        p('p_danisman', v('v_danisman'));
-        p('p_iletisim', v('v_iletisim'));
-
-        let listeBody = document.getElementById('p_urun_listesi');
-        listeBody.innerHTML = '';
+        let sirket = v('v_sirket_adi');
+        if(sirket.trim() === '') sirket = 'ŞİRKET ADI';
         
+        let tarih = formatTarih(v('v_tarih'));
+        let refno = v('v_refno');
+        let musteri = v('v_musteri');
+        let termin = v('v_termin_gun');
+        let odeme = v('v_odeme');
+        let gecerlilik = formatTarih(v('v_gecerlilik'));
+        let danisman = v('v_danisman');
+        let iletisim = v('v_iletisim');
+        let genelToplam = document.getElementById('v_genelToplamEkran').innerText;
+
+        let urunListesiHtml = '';
         let urunKartlari = document.querySelectorAll('.urun-karti');
         urunKartlari.forEach(kart => {
             let ad = kart.querySelector('.u_ad').value;
@@ -311,20 +221,123 @@
             let netFiyati = kart.querySelector('.u_net').value;
             let listeHtml = listeFiyati ? `<br><del style="font-size:8pt; color:#a0aec0;">${listeFiyati}</del>` : '';
             
-            let tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td><strong>${ad}</strong></td>
-                <td><span style="font-size: 8.5pt; color: #4a5568;">${detay}</span></td>
-                <td style="text-align: right; vertical-align: middle;">
-                    ${listeHtml}
-                    <div style="font-size:11pt; font-weight:bold;">${netFiyati}</div>
-                </td>
+            urunListesiHtml += `
+                <tr>
+                    <td><strong>${ad}</strong></td>
+                    <td><span style="font-size: 8.5pt; color: #4a5568;">${detay}</span></td>
+                    <td style="text-align: right; vertical-align: middle;">
+                        ${listeHtml}
+                        <div style="font-size:11pt; font-weight:bold;">${netFiyati}</div>
+                    </td>
+                </tr>
             `;
-            listeBody.appendChild(tr);
         });
 
-        p('p_toplam', document.getElementById('v_genelToplamEkran').innerText);
-        window.print();
+        // Tamamen izole edilmiş, link ve tarih basılmasını engelleyen yeni HTML yapısı
+        let printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>Fiyat Teklifi</title>
+                <style>
+                    /* Link (Header/Footer) Basılmasını Engelleyen Saf CSS Kuralları */
+                    @page { 
+                        size: A4; 
+                        margin: 0; /* Tarayıcının varsayılan marginlerini sıfırla */
+                    }
+                    /* Sayfayı PDF standartlarında ayarla */
+                    body { 
+                        font-family: 'Helvetica', 'Arial', sans-serif; 
+                        margin: 0; 
+                        padding: 15mm; 
+                        color: #000; 
+                        background-color: #fff;
+                        -webkit-print-color-adjust: exact !important; 
+                        print-color-adjust: exact !important;
+                    }
+                    /* Tarayıcı eklentilerini (URL, Tarih vb.) gizlemeye zorlama */
+                    @media print {
+                        body { margin: 0; padding: 15mm; }
+                        /* Header ve Footer'ı tamamen sakla */
+                        @page :left { @top-left { content: ""; } @bottom-left { content: ""; } }
+                        @page :right { @top-right { content: ""; } @bottom-right { content: ""; } }
+                    }
+
+                    .p-header { display: flex; justify-content: space-between; border-bottom: 3px solid #1a365d; padding-bottom: 15px; margin-bottom: 25px; }
+                    .p-title { font-size: 26pt; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
+                    .p-meta { text-align: right; font-size: 10pt; color: #4a5568; line-height: 1.5; }
+                    
+                    .p-client-box { font-size: 11pt; margin-bottom: 20px; line-height: 1.5; }
+                    
+                    .p-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+                    .p-table th, .p-table td { border: 1px solid #cbd5e0; padding: 10px; text-align: left; vertical-align: top; }
+                    .p-table th { background-color: #1a365d; color: white; font-weight: bold; font-size: 10pt; }
+                    .p-table td { font-size: 10pt; }
+                    
+                    .p-totals { text-align: right; font-size: 14pt; font-weight: 900; color: #e53e3e; margin-bottom: 25px; padding-right: 5px; }
+                    
+                    .p-terms { background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 15px; font-size: 9.5pt; border-left: 4px solid #1a365d; line-height: 1.6; }
+                    
+                    .p-legal { font-size: 7pt; color: #718096; text-align: justify; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.4; }
+                </style>
+            </head>
+            <body>
+                <div class="p-header">
+                    <div><h1 class="p-title">${sirket}</h1></div>
+                    <div class="p-meta">
+                        Tarih: <span>${tarih}</span><br>
+                        Teklif No: <strong>${refno}</strong>
+                    </div>
+                </div>
+
+                <div class="p-client-box">
+                    <strong>Sayın,</strong> <span>${musteri}</span><br><br>
+                    Mağazamızda yapmış olduğunuz görüşmelere istinaden, talep etmiş olduğunuz ürünlere ait kurumsal fiyat teklifi aşağıda bilgilerinize sunulmuştur. Bizi tercih ettiğiniz için teşekkür ederiz.
+                </div>
+
+                <div style="text-align: center; font-size: 14pt; font-weight: bold; color: #1a365d; margin-bottom: 10px;">FİYAT TEKLİFİ</div>
+
+                <table class="p-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50%">Ürün & Model Açıklaması</th>
+                            <th style="width: 30%">Teknik Detaylar / İçerik</th>
+                            <th style="width: 20%; text-align: right;">Net Tutar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${urunListesiHtml}
+                    </tbody>
+                </table>
+
+                <div class="p-totals">
+                    Genel Toplam: <span>${genelToplam}</span>
+                </div>
+
+                <div class="p-terms">
+                    <strong>TİCARİ BİLGİLENDİRME VE ŞARTLAR</strong><br>
+                    • <strong>Termin Süresi:</strong> Sipariş onayı ve peşinat işlemlerine müteakip <strong><span>${termin}</span> iş günü</strong> içerisinde teslim edilecektir.<br>
+                    • <strong>Ödeme Şekli:</strong> <span>${odeme}</span><br>
+                    • <strong>Teslimat ve Kurulum:</strong> Nakliye ve kurulum masrafları satıcı firmaya (${sirket}) aittir. Ürün montajları yetkili servis güvencesiyle yapılacaktır.<br>
+                    • <strong>Garanti:</strong> Tüm ürünler distribütör/marka yetkili servis garantisi altındadır.<br>
+                    • <strong>Kur ve Geçerlilik:</strong> Bu teklif <strong><span>${gecerlilik}</span></strong> tarihine kadar geçerlidir. Fiyatlara KDV dahildir. Olası kur/enflasyon dalgalanmalarında değişiklik hakkı saklıdır.<br><br>
+                    <strong>Müşteri Temsilcisi:</strong> <span>${danisman}</span> | <strong>İletişim:</strong> <span>${iletisim}</span>
+                </div>
+
+                <div class="p-legal">
+                    <strong>KVKK ve YASAL AYDINLATMA METNİ:</strong> İşbu teklif belgesi, yalnızca bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımamaktadır. Fiyatlarda stok durumuna göre değişiklik yapma hakkı ${sirket}'de saklıdır. Müşteri, işbu teklifin hazırlanması ve kendisine iletilmesi amacıyla kendi açık rızası ile beyan ettiği iletişim bilgilerinin, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında ${sirket} tarafından müşteri ilişkileri yönetimi ve bilgilendirme süreçleri dahilinde işlenmesini, saklanmasını ve bu iletişim kanalları üzerinden kendisine ulaşılmasını kabul ve beyan eder.
+                </div>
+            </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        printWindow.focus();
+        
+        // İçeriğin yüklenmesi için çok kısa bir süre bekleyip yazdır
+        setTimeout(() => {
+            printWindow.print();
+        }, 250);
     }
 
     function whatsappYaziGonder() {
