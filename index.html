@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Kurumsal Teklif Sistemi</title>
+    <!-- PDF Oluşturma Kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* =========================================
            EKRAN GÖRÜNÜMÜ (KOYU MOD FORM)
@@ -53,15 +55,17 @@
         .btn-wp { background-color: #25D366; color: white; }
         button.islem-btn { padding: 15px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; transition: opacity 0.2s; box-sizing: border-box; }
         button.islem-btn:active { transform: scale(0.98); }
+        
+        /* Yükleniyor Göstergesi */
+        #yukleniyor { display: none; text-align: center; color: #4ade80; font-weight: bold; margin-top: 15px; font-size: 16px; }
     </style>
 </head>
 <body>
 
 <div id="formArea">
     <div class="header">
-        <!-- oninput ile yazılan her harfi telefonun hafızasına kaydeder -->
         <input type="text" id="v_sirket_adi" class="sirket-adi-input" value="FATİH AVM" oninput="localStorage.setItem('hafiza_sirket', this.value)">
-        <div class="sirket-adi-info">Teklif Sisteminin Sahibi (Burayı değiştirirseniz sistem bu ismi hep hatırlar)</div>
+        <div class="sirket-adi-info">Teklif Sisteminin Sahibi (Sistem bu ismi hep hatırlar)</div>
     </div>
 
     <div class="section-title">Müşteri & Evrak Bilgileri</div>
@@ -111,17 +115,17 @@
         </div>
         <div class="form-group">
             <label>Danışman Adı</label>
-            <!-- oninput ile ismi kaydeder -->
             <input type="text" id="v_danisman" placeholder="" oninput="localStorage.setItem('hafiza_danisman', this.value)">
         </div>
         <div class="form-group">
             <label>İletişim Numaranız</label>
-            <!-- oninput ile numarayı kaydeder -->
             <input type="text" id="v_iletisim" placeholder="" oninput="localStorage.setItem('hafiza_iletisim', this.value)">
         </div>
     </div>
 
-    <button class="islem-btn btn-pdf" onclick="pdfOlarakYazdir()">📄 PDF Ekranını Aç (Önizle ve Yazdır)</button>
+    <button class="islem-btn btn-pdf" id="btnPdfUret" onclick="direktPdfIndir()">📄 PDF Dosyasını İndir</button>
+    <div id="yukleniyor">PDF Oluşturuluyor, lütfen bekleyin...</div>
+    
     <button class="islem-btn btn-wp" onclick="whatsappYaziGonder()">💬 Direkt Yazı Olarak WhatsApp'a At</button>
 </div>
 
@@ -129,7 +133,6 @@
     let urunSayaci = 0;
 
     window.onload = function() {
-        // TARAYICI HAFIZASINI KONTROL ET VE YÜKLE
         let kayitliSirket = localStorage.getItem('hafiza_sirket');
         if(kayitliSirket) document.getElementById('v_sirket_adi').value = kayitliSirket;
         
@@ -139,12 +142,10 @@
         let kayitliIletisim = localStorage.getItem('hafiza_iletisim');
         if(kayitliIletisim) document.getElementById('v_iletisim').value = kayitliIletisim;
 
-        // Tarihleri Doldur
         document.getElementById('v_tarih').valueAsDate = new Date();
         let fDate = new Date(); fDate.setDate(fDate.getDate() + 15);
         document.getElementById('v_gecerlilik').valueAsDate = fDate;
         
-        // Referans No Üret
         let d = new Date();
         document.getElementById('v_refno').value = "TR-" + d.getFullYear() + (d.getMonth()+1).toString().padStart(2,'0') + d.getDate().toString().padStart(2,'0') + "-" + Math.floor(1000 + Math.random() * 9000);
         
@@ -211,19 +212,14 @@
         return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : val;
     }
 
-    function pdfOlarakYazdir() {
+    // Doğrudan Arka Planda PDF Oluşturup İndiren Fonksiyon
+    function direktPdfIndir() {
+        document.getElementById('btnPdfUret').style.display = 'none';
+        document.getElementById('yukleniyor').style.display = 'block';
+
         let v = id => document.getElementById(id).value;
-        let sirket = v('v_sirket_adi');
-        if(sirket.trim() === '') sirket = 'ŞİRKET ADI';
-        
-        let tarih = formatTarih(v('v_tarih'));
-        let refno = v('v_refno');
-        let musteri = v('v_musteri');
-        let termin = v('v_termin_gun');
-        let odeme = v('v_odeme');
-        let gecerlilik = formatTarih(v('v_gecerlilik'));
-        let danisman = v('v_danisman');
-        let iletisim = v('v_iletisim');
+        let sirket = v('v_sirket_adi') || 'ŞİRKET ADI';
+        let musteri = v('v_musteri') || 'Müşteri';
         let genelToplam = document.getElementById('v_genelToplamEkran').innerText;
 
         let urunListesiHtml = '';
@@ -237,9 +233,9 @@
             
             urunListesiHtml += `
                 <tr>
-                    <td><strong>${ad}</strong></td>
-                    <td><span style="font-size: 8.5pt; color: #4a5568;">${detay}</span></td>
-                    <td style="text-align: right; vertical-align: middle;">
+                    <td style="border: 1px solid #cbd5e0; padding: 10px;"><strong>${ad}</strong></td>
+                    <td style="border: 1px solid #cbd5e0; padding: 10px;"><span style="font-size: 8.5pt; color: #4a5568;">${detay}</span></td>
+                    <td style="border: 1px solid #cbd5e0; padding: 10px; text-align: right; vertical-align: middle;">
                         ${listeHtml}
                         <div style="font-size:11pt; font-weight:bold;">${netFiyati}</div>
                     </td>
@@ -247,102 +243,82 @@
             `;
         });
 
-        // Yeni Pencerede PDF şablonunu yarat
-        let printWindow = window.open('', '_blank');
-        printWindow.document.write(`
-            <html>
-            <head>
-                <title>Fiyat Teklifi</title>
-                <style>
-                    /* Link ve Tarih Basılmasını Kesin Engelleyen Saf CSS */
-                    @page { size: A4; margin: 0; }
-                    body { 
-                        font-family: 'Helvetica', 'Arial', sans-serif; 
-                        margin: 0; 
-                        padding: 15mm; 
-                        color: #000; 
-                        background-color: #fff;
-                        -webkit-print-color-adjust: exact !important; 
-                        print-color-adjust: exact !important;
-                    }
-                    @media print {
-                        body { margin: 0; padding: 15mm; }
-                        @page :left { @top-left { content: ""; } @bottom-left { content: ""; } }
-                        @page :right { @top-right { content: ""; } @bottom-right { content: ""; } }
-                    }
-
-                    .p-header { display: flex; justify-content: space-between; border-bottom: 3px solid #1a365d; padding-bottom: 15px; margin-bottom: 25px; }
-                    .p-title { font-size: 26pt; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase; letter-spacing: 1px; }
-                    .p-meta { text-align: right; font-size: 10pt; color: #4a5568; line-height: 1.5; }
-                    
-                    .p-client-box { font-size: 11pt; margin-bottom: 20px; line-height: 1.5; }
-                    
-                    .p-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
-                    .p-table th, .p-table td { border: 1px solid #cbd5e0; padding: 10px; text-align: left; vertical-align: top; }
-                    .p-table th { background-color: #1a365d; color: white; font-weight: bold; font-size: 10pt; }
-                    .p-table td { font-size: 10pt; }
-                    
-                    .p-totals { text-align: right; font-size: 14pt; font-weight: 900; color: #e53e3e; margin-bottom: 25px; padding-right: 5px; }
-                    
-                    .p-terms { background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 15px; font-size: 9.5pt; border-left: 4px solid #1a365d; line-height: 1.6; }
-                    
-                    .p-legal { font-size: 7pt; color: #718096; text-align: justify; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.4; }
-                </style>
-            </head>
-            <body>
-                <div class="p-header">
-                    <div><h1 class="p-title">${sirket}</h1></div>
-                    <div class="p-meta">
-                        Tarih: <span>${tarih}</span><br>
-                        Teklif No: <strong>${refno}</strong>
-                    </div>
-                </div>
-
-                <div class="p-client-box">
-                    <strong>Sayın,</strong> <span>${musteri}</span><br><br>
-                    Mağazamızda yapmış olduğunuz görüşmelere istinaden, talep etmiş olduğunuz ürünlere ait kurumsal fiyat teklifi aşağıda bilgilerinize sunulmuştur. Bizi tercih ettiğiniz için teşekkür ederiz.
-                </div>
-
-                <div style="text-align: center; font-size: 14pt; font-weight: bold; color: #1a365d; margin-bottom: 10px;">FİYAT TEKLİFİ</div>
-
-                <table class="p-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 50%">Ürün & Model Açıklaması</th>
-                            <th style="width: 30%">Teknik Detaylar / İçerik</th>
-                            <th style="width: 20%; text-align: right;">Net Tutar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${urunListesiHtml}
-                    </tbody>
-                </table>
-
-                <div class="p-totals">
-                    Genel Toplam: <span>${genelToplam}</span>
-                </div>
-
-                <div class="p-terms">
-                    <strong>TİCARİ BİLGİLENDİRME VE ŞARTLAR</strong><br>
-                    • <strong>Termin Süresi:</strong> Sipariş onayı ve peşinat işlemlerine müteakip <strong><span>${termin}</span> iş günü</strong> içerisinde teslim edilecektir.<br>
-                    • <strong>Ödeme Şekli:</strong> <span>${odeme}</span><br>
-                    • <strong>Teslimat ve Kurulum:</strong> Nakliye ve kurulum masrafları satıcı firmaya (${sirket}) aittir. Ürün montajları yetkili servis güvencesiyle yapılacaktır.<br>
-                    • <strong>Garanti:</strong> Tüm ürünler distribütör/marka yetkili servis garantisi altındadır.<br>
-                    • <strong>Kur ve Geçerlilik:</strong> Bu teklif <strong><span>${gecerlilik}</span></strong> tarihine kadar geçerlidir. Fiyatlara KDV dahildir. Olası kur/enflasyon dalgalanmalarında değişiklik hakkı saklıdır.<br><br>
-                    <strong>Müşteri Temsilcisi:</strong> <span>${danisman}</span> | <strong>İletişim:</strong> <span>${iletisim}</span>
-                </div>
-
-                <div class="p-legal">
-                    <strong>KVKK ve YASAL AYDINLATMA METNİ:</strong> İşbu teklif belgesi, yalnızca bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımamaktadır. Fiyatlarda stok durumuna göre değişiklik yapma hakkı ${sirket}'de saklıdır. Müşteri, işbu teklifin hazırlanması ve kendisine iletilmesi amacıyla kendi açık rızası ile beyan ettiği iletişim bilgilerinin, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında ${sirket} tarafından müşteri ilişkileri yönetimi ve bilgilendirme süreçleri dahilinde işlenmesini, saklanmasını ve bu iletişim kanalları üzerinden kendisine ulaşılmasını kabul ve beyan eder.
-                </div>
-            </body>
-            </html>
-        `);
+        // Arka planda geçici bir HTML elementi oluşturuluyor
+        let tempDiv = document.createElement('div');
+        tempDiv.style.width = '800px';
+        tempDiv.style.padding = '30px';
+        tempDiv.style.backgroundColor = '#ffffff';
+        tempDiv.style.color = '#000000';
+        tempDiv.style.fontFamily = 'Arial, sans-serif';
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.top = '-9999px'; // Ekranda görünmemesi için dışarı atılıyor
         
-        printWindow.document.close();
-        printWindow.focus();
-        
-        setTimeout(() => { printWindow.print(); }, 250);
+        tempDiv.innerHTML = `
+            <div style="display: flex; justify-content: space-between; border-bottom: 3px solid #1a365d; padding-bottom: 15px; margin-bottom: 25px; align-items: flex-end;">
+                <div><h1 style="font-size: 24pt; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase;">${sirket}</h1></div>
+                <div style="text-align: right; font-size: 10pt; color: #4a5568; line-height: 1.5;">
+                    Tarih: <span>${formatTarih(v('v_tarih'))}</span><br>
+                    Teklif No: <strong>${v('v_refno')}</strong>
+                </div>
+            </div>
+
+            <div style="font-size: 11pt; margin-bottom: 20px; line-height: 1.5;">
+                <strong>Sayın,</strong> <span>${v('v_musteri')}</span><br><br>
+                Mağazamızda yapmış olduğunuz görüşmelere istinaden, talep etmiş olduğunuz ürünlere ait kurumsal fiyat teklifi aşağıda bilgilerinize sunulmuştur. Bizi tercih ettiğiniz için teşekkür ederiz.
+            </div>
+
+            <div style="text-align: center; font-size: 14pt; font-weight: bold; color: #1a365d; margin-bottom: 15px;">FİYAT TEKLİFİ</div>
+
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+                <thead>
+                    <tr>
+                        <th style="width: 45%; border: 1px solid #cbd5e0; padding: 10px; text-align: left; background-color: #1a365d; color: white;">Ürün & Model Açıklaması</th>
+                        <th style="width: 35%; border: 1px solid #cbd5e0; padding: 10px; text-align: left; background-color: #1a365d; color: white;">Teknik Detaylar / İçerik</th>
+                        <th style="width: 20%; border: 1px solid #cbd5e0; padding: 10px; text-align: right; background-color: #1a365d; color: white;">Net Tutar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${urunListesiHtml}
+                </tbody>
+            </table>
+
+            <div style="text-align: right; font-size: 14pt; font-weight: 900; color: #e53e3e; margin-bottom: 25px;">
+                Genel Toplam: <span>${genelToplam}</span>
+            </div>
+
+            <div style="background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 15px; font-size: 9.5pt; border-left: 4px solid #1a365d; line-height: 1.6;">
+                <strong>TİCARİ BİLGİLENDİRME VE ŞARTLAR</strong><br>
+                • <strong>Termin Süresi:</strong> Sipariş onayı ve peşinat işlemlerine müteakip <strong><span>${v('v_termin_gun')}</span> iş günü</strong> içerisinde teslim edilecektir.<br>
+                • <strong>Ödeme Şekli:</strong> <span>${v('v_odeme')}</span><br>
+                • <strong>Teslimat ve Kurulum:</strong> Nakliye ve kurulum masrafları satıcı firmaya (${sirket}) aittir. Ürün montajları yetkili servis güvencesiyle yapılacaktır.<br>
+                • <strong>Garanti:</strong> Tüm ürünler distribütör/marka yetkili servis garantisi altındadır.<br>
+                • <strong>Kur ve Geçerlilik:</strong> Bu teklif <strong><span>${formatTarih(v('v_gecerlilik'))}</span></strong> tarihine kadar geçerlidir. Fiyatlara KDV dahildir. Olası kur/enflasyon dalgalanmalarında değişiklik hakkı saklıdır.<br><br>
+                <strong>Müşteri Temsilcisi:</strong> <span>${v('v_danisman')}</span> | <strong>İletişim:</strong> <span>${v('v_iletisim')}</span>
+            </div>
+
+            <div style="font-size: 7.5pt; color: #718096; text-align: justify; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.4;">
+                <strong>KVKK ve YASAL AYDINLATMA METNİ:</strong> İşbu teklif belgesi, yalnızca bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımamaktadır. Fiyatlarda stok durumuna göre değişiklik yapma hakkı ${sirket}'de saklıdır. Müşteri, işbu teklifin hazırlanması ve kendisine iletilmesi amacıyla kendi açık rızası ile beyan ettiği iletişim bilgilerinin, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) kapsamında ${sirket} tarafından müşteri ilişkileri yönetimi ve bilgilendirme süreçleri dahilinde işlenmesini, saklanmasını ve bu iletişim kanalları üzerinden kendisine ulaşılmasını kabul ve beyan eder.
+            </div>
+        `;
+
+        document.body.appendChild(tempDiv);
+
+        let dosyaAdi = musteri.replace(/\s+/g, '_') + '_Teklif.pdf';
+
+        var opt = {
+            margin:       10,
+            filename:     dosyaAdi,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        };
+
+        // Kütüphane PDF'i oluşturup indirmeyi başlatıyor
+        html2pdf().set(opt).from(tempDiv).save().then(function() {
+            document.body.removeChild(tempDiv);
+            document.getElementById('btnPdfUret').style.display = 'block';
+            document.getElementById('yukleniyor').style.display = 'none';
+        });
     }
 
     function whatsappYaziGonder() {
