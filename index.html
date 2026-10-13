@@ -6,18 +6,15 @@
     <title>Kurumsal Teklif Sistemi</title>
     <style>
         /* =========================================
-           GENEL AYARLAR
+           FORM EKRANI (KOYU MOD)
            ========================================= */
         :root {
             --bg-color: #121212; --surface-color: #1e1e1e;
             --primary-color: #3b82f6; --text-main: #e0e0e0;
             --text-muted: #9e9e9e; --border-color: #333333;
         }
-        body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 10px; box-sizing: border-box; overflow-x: hidden; }
+        body { font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; padding: 10px; box-sizing: border-box; }
         
-        /* =========================================
-           FORM EKRANI
-           ========================================= */
         #formArea { width: 100%; max-width: 900px; margin: 0 auto; background-color: var(--surface-color); padding: 15px; box-sizing: border-box; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
         .header { border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; }
         .sirket-adi-input { background: transparent; border: 1px dashed var(--primary-color); color: #ffffff; font-size: 24px; font-weight: bold; text-align: center; padding: 10px; border-radius: 8px; width: 100%; box-sizing: border-box; margin-bottom: 5px; }
@@ -35,29 +32,45 @@
         .urun-karti-sil { position: absolute; top: 10px; right: 10px; background: #e53e3e; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: bold; z-index: 10;}
         .btn-ekle { background-color: #4a5568; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 20px; font-size: 15px; }
         .toplam-alani { background-color: #1a1a1a; border: 1px solid var(--border-color); padding: 15px; border-radius: 8px; text-align: right; font-size: 18px; color: #4ade80; font-weight: bold; margin-bottom: 20px; }
-        .btn-pdf { background-color: #3b82f6; color: white; }
+        .btn-pdf { background-color: #e53e3e; color: white; }
         .btn-wp { background-color: #25D366; color: white; }
         button.islem-btn { padding: 15px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; }
 
         /* =========================================
-           TEMİZ EKRAN GÖRÜNTÜSÜ (PREVIEW) MODU
+           BASKI / PDF ÇIKTI ALANI (HTTP LINKLERİ KAPALI)
            ========================================= */
-        #previewArea { display: none; background-color: white; color: black; position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh; padding: 20px; box-sizing: border-box; z-index: 9999; }
-        .pr-header { display: flex; justify-content: space-between; border-bottom: 2px solid #1a365d; padding-bottom: 10px; margin-bottom: 15px; align-items: flex-end; }
-        .pr-title { font-size: 20px; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase; }
-        .pr-meta { text-align: right; font-size: 11px; color: #4a5568; line-height: 1.4; }
-        .pr-client { font-size: 13px; margin-bottom: 15px; line-height: 1.4; color: #2d3748; }
-        .pr-h2 { text-align: center; font-size: 16px; font-weight: bold; color: #1a365d; margin-bottom: 10px; }
-        
-        .pr-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px; }
-        .pr-table th, .pr-table td { border: 1px solid #cbd5e0; padding: 6px; text-align: left; vertical-align: middle; }
-        .pr-table th { background-color: #1a365d; color: white; font-weight: bold; }
-        .pr-totals { text-align: right; font-size: 16px; font-weight: 900; color: #e53e3e; margin-bottom: 20px; }
-        
-        .pr-terms { background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 10px; font-size: 11px; border-left: 3px solid #1a365d; line-height: 1.5; color: #2d3748; }
-        .pr-legal { font-size: 9px; color: #718096; text-align: justify; margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 10px; line-height: 1.3; }
-        
-        .btn-kapat { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: #e53e3e; color: white; padding: 12px 25px; border: none; border-radius: 30px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); z-index: 10000; font-size: 14px; }
+        #printArea { display: none; }
+
+        @media print {
+            /* Tarayıcının ekleyeceği header/footer url'leri ve tarihleri sıfırlama kuralları */
+            @page {
+                size: A4;
+                margin: 10mm 10mm 10mm 10mm;
+            }
+            body {
+                background-color: white !important;
+                color: black !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            #formArea { display: none !important; }
+            #printArea { display: block !important; font-family: 'Helvetica', 'Arial', sans-serif; }
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+            .p-header { display: flex; justify-content: space-between; border-bottom: 3px solid #1a365d; padding-bottom: 12px; margin-bottom: 20px; align-items: flex-end; }
+            .p-title { font-size: 24pt; font-weight: 900; color: #1a365d; margin: 0; text-transform: uppercase; }
+            .p-meta { text-align: right; font-size: 10pt; color: #4a5568; line-height: 1.4; }
+            .p-client-box { font-size: 11pt; margin-bottom: 20px; line-height: 1.5; color: #2d3748; }
+            
+            .p-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+            .p-table th, .p-table td { border: 1px solid #cbd5e0; padding: 8px 10px; text-align: left; vertical-align: top; }
+            .p-table th { background-color: #1a365d; color: white; font-weight: bold; font-size: 10pt; }
+            .p-table td { font-size: 10pt; }
+            
+            .p-totals { text-align: right; font-size: 14pt; font-weight: 900; color: #e53e3e; margin-bottom: 20px; }
+            .p-terms { background-color: #f7fafc; border: 1px solid #e2e8f0; padding: 12px; font-size: 9.5pt; border-left: 4px solid #1a365d; line-height: 1.5; color: #2d3748; }
+            .p-legal { font-size: 7.5pt; color: #718096; text-align: justify; margin-top: 25px; border-top: 1px solid #e2e8f0; padding-top: 8px; line-height: 1.3; }
+        }
     </style>
 </head>
 <body>
@@ -97,7 +110,7 @@
     <div class="form-grid">
         <div class="form-group">
             <label>Termin / Teslimat (Gün)</label>
-            <input type="number" id="v_termin_gun" placeholder="">
+            <input type="number" id="v_termin_gun" placeholder="" inputmode="numeric">
         </div>
         <div class="form-group">
             <label>Ödeme Şekli</label>
@@ -120,60 +133,59 @@
         </div>
         <div class="form-group">
             <label>İletişim Numaranız</label>
-            <input type="text" id="v_iletisim" placeholder="" oninput="localStorage.setItem('hafiza_iletisim', this.value)">
+            <input type="text" id="v_iletisim" placeholder="" inputmode="numeric" oninput="localStorage.setItem('hafiza_iletisim', this.value)">
         </div>
     </div>
 
-    <button class="islem-btn btn-pdf" onclick="temizGorunumeGec()">📱 Teklif Görünümüne Geç (Ekran Görüntüsü İçin)</button>
+    <button class="islem-btn btn-pdf" onclick="pdfOnizlemeAc()">📄 PDF / Yazdır Ekranını Aç</button>
     <button class="islem-btn btn-wp" onclick="whatsappYaziGonder()">💬 Direkt Yazı Olarak WhatsApp'a At</button>
 </div>
 
-<!-- EKRAN GÖRÜNTÜSÜ ALINACAK TEMİZ ALAN -->
-<div id="previewArea">
-    <div class="pr-header">
-        <div><h1 class="pr-title" id="pr_sirket"></h1></div>
-        <div class="pr-meta">
-            Tarih: <span id="pr_tarih"></span><br>
-            Teklif No: <strong id="pr_refno"></strong>
+<!-- GİZLİ BASKI ALANI -->
+<div id="printArea">
+    <div class="p-header">
+        <div><h1 class="p-title" id="p_sirket"></h1></div>
+        <div class="p-meta">
+            Tarih: <span id="p_tarih"></span><br>
+            Teklif No: <strong id="p_refno"></strong>
         </div>
     </div>
 
-    <div class="pr-client">
-        <strong>Sayın,</strong> <span id="pr_musteri"></span><br>
-        Mağazamızda yapmış olduğunuz görüşmelere istinaden kurumsal fiyat teklifi aşağıda sunulmuştur. Bizi tercih ettiğiniz için teşekkür ederiz.
+    <div class="p-client-box">
+        <strong>Sayın,</strong> <span id="p_musteri"></span><br><br>
+        Mağazamızda yapmış olduğunuz görüşmelere istinaden, talep etmiş olduğunuz ürünlere ait kurumsal fiyat teklifi aşağıda bilgilerinize sunulmuştur. Bizi tercih ettiğiniz için teşekkür ederiz.
     </div>
 
-    <div class="pr-h2">FİYAT TEKLİFİ</div>
+    <div style="text-align: center; font-size: 13pt; font-weight: bold; color: #1a365d; margin-bottom: 10px;">FİYAT TEKLİFİ</div>
 
-    <table class="pr-table">
+    <table class="p-table">
         <thead>
             <tr>
-                <th style="width: 45%">Ürün & Model</th>
-                <th style="width: 35%">Detaylar</th>
+                <th style="width: 45%">Ürün & Model Açıklaması</th>
+                <th style="width: 35%">Teknik Detaylar / İçerik</th>
                 <th style="width: 20%; text-align: right;">Net Tutar</th>
             </tr>
         </thead>
-        <tbody id="pr_urunler"></tbody>
+        <tbody id="p_urun_listesi"></tbody>
     </table>
 
-    <div class="pr-totals">
-        Genel Toplam: <span id="pr_toplam"></span>
+    <div class="p-totals">
+        Genel Toplam: <span id="p_toplam"></span>
     </div>
 
-    <div class="pr-terms">
-        <strong>TİCARİ ŞARTLAR</strong><br>
-        • <strong>Termin:</strong> Sipariş onayına müteakip <strong><span id="pr_termin"></span> iş günü</strong> içerisinde teslim edilecektir.<br>
-        • <strong>Ödeme:</strong> <span id="pr_odeme"></span><br>
-        • <strong>Teslimat:</strong> Nakliye/kurulum satıcı firmaya aittir. Ürünler yetkili servis güvencesindedir.<br>
-        • <strong>Geçerlilik:</strong> Bu teklif <strong><span id="pr_gecerlilik"></span></strong> tarihine kadar geçerlidir.<br><br>
-        <strong>Müşteri Temsilcisi:</strong> <span id="pr_danisman"></span> | <strong>İletişim:</strong> <span id="pr_iletisim"></span>
+    <div class="p-terms">
+        <strong>TİCARİ BİLGİLENDİRME VE ŞARTLAR</strong><br>
+        • <strong>Termin Süresi:</strong> Sipariş onayı ve peşinat işlemlerine müteakip <strong><span id="p_termin"></span> iş günü</strong> içerisinde teslim edilecektir.<br>
+        • <strong>Ödeme Şekli:</strong> <span id="p_odeme"></span><br>
+        • <strong>Teslimat ve Kurulum:</strong> Nakliye ve kurulum satıcı firmaya aittir. Ürün montajları yetkili servis güvencesiyle yapılacaktır.<br>
+        • <strong>Garanti:</strong> Tüm ürünler distribütör/marka yetkili servis garantisi altındadır.<br>
+        • <strong>Kur ve Geçerlilik:</strong> Bu teklif <strong><span id="p_gecerlilik"></span></strong> tarihine kadar geçerlidir. Fiyatlara KDV dahildir.<br><br>
+        <strong>Müşteri Temsilcisi:</strong> <span id="p_danisman"></span> | <strong>İletişim:</strong> <span id="p_iletisim"></span>
     </div>
 
-    <div class="pr-legal">
-        <strong>YASAL AYDINLATMA:</strong> İşbu teklif bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımaz. Fiyatlarda stok durumuna göre değişiklik yapma hakkı satıcıda saklıdır.
+    <div class="p-legal">
+        <strong>KVKK ve YASAL AYDINLATMA METNİ:</strong> İşbu teklif belgesi, yalnızca bilgi amaçlı olup kesin satış sözleşmesi niteliği taşımamaktadır. Fiyatlarda stok durumuna göre değişiklik yapma hakkı saklıdır. Müşteri, işbu teklifin hazırlanması ve kendisine iletilmesi amacıyla beyan ettiği iletişim bilgilerinin KVKK kapsamında işlenmesini kabul eder.
     </div>
-
-    <button class="btn-kapat" onclick="formEkraninaDon()">Kapat ve Forma Dön</button>
 </div>
 
 <script>
@@ -218,11 +230,11 @@
             </div>
             <div class="form-group">
                 <label>Liste Fiyatı (Üstü Çizilir)</label>
-                <input type="text" class="u_liste" placeholder="0 ₺" oninput="paraVeToplam(this)">
+                <input type="text" class="u_liste" placeholder="0 ₺" inputmode="numeric" oninput="paraVeToplam(this)">
             </div>
             <div class="form-group">
                 <label>Net Teklif Tutarınız</label>
-                <input type="text" class="u_net" placeholder="0 ₺" oninput="paraVeToplam(this)">
+                <input type="text" class="u_net" placeholder="0 ₺" inputmode="numeric" oninput="paraVeToplam(this)">
             </div>
         `;
         kapsayici.appendChild(kart);
@@ -253,23 +265,22 @@
         return p.length === 3 ? `${p[2]}.${p[1]}.${p[0]}` : val;
     }
 
-    /* == TEMİZ EKRANA GEÇİŞ KODLARI == */
-    function temizGorunumeGec() {
+    function pdfOnizlemeAc() {
         let v = id => document.getElementById(id).value;
         let p = (id, val) => document.getElementById(id).innerText = val;
 
-        p('pr_sirket', v('v_sirket_adi') || 'ŞİRKET ADI');
-        p('pr_tarih', formatTarih(v('v_tarih')));
-        p('pr_refno', v('v_refno'));
-        p('pr_musteri', v('v_musteri') || 'Değerli Müşterimiz');
-        p('pr_termin', v('v_termin_gun'));
-        p('pr_odeme', v('v_odeme'));
-        p('pr_gecerlilik', formatTarih(v('v_gecerlilik')));
-        p('pr_danisman', v('v_danisman'));
-        p('pr_iletisim', v('v_iletisim'));
-        p('pr_toplam', document.getElementById('v_genelToplamEkran').innerText);
+        p('p_sirket', v('v_sirket_adi') || 'ŞİRKET ADI');
+        p('p_tarih', formatTarih(v('v_tarih')));
+        p('p_refno', v('v_refno'));
+        p('p_musteri', v('v_musteri') || 'Değerli Müşterimiz');
+        p('p_termin', v('v_termin_gun'));
+        p('p_odeme', v('v_odeme'));
+        p('p_gecerlilik', formatTarih(v('v_gecerlilik')));
+        p('p_danisman', v('v_danisman'));
+        p('p_iletisim', v('v_iletisim'));
+        p('p_toplam', document.getElementById('v_genelToplamEkran').innerText);
 
-        let listeBody = document.getElementById('pr_urunler');
+        let listeBody = document.getElementById('p_urun_listesi');
         listeBody.innerHTML = '';
         
         let urunKartlari = document.querySelectorAll('.urun-karti');
@@ -278,31 +289,23 @@
             let detay = kart.querySelector('.u_detay').value.replace(/\n/g, '<br>');
             let listeFiyati = kart.querySelector('.u_liste').value;
             let netFiyati = kart.querySelector('.u_net').value;
-            let listeHtml = listeFiyati ? `<br><del style="font-size:9px; color:#a0aec0;">${listeFiyati}</del>` : '';
+            let listeHtml = listeFiyati ? `<br><del style="font-size:8pt; color:#a0aec0;">${listeFiyati}</del>` : '';
             
             let tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><strong>${ad}</strong></td>
-                <td><span style="font-size: 11px; color: #4a5568;">${detay}</span></td>
+                <td><span style="font-size: 9pt; color: #4a5568;">${detay}</span></td>
                 <td style="text-align: right;">
                     ${listeHtml}
-                    <div style="font-size:13px; font-weight:bold;">${netFiyati}</div>
+                    <div style="font-size:10.5pt; font-weight:bold;">${netFiyati}</div>
                 </td>
             `;
             listeBody.appendChild(tr);
         });
 
-        document.getElementById('formArea').style.display = 'none';
-        document.getElementById('previewArea').style.display = 'block';
-        window.scrollTo(0, 0); // Sayfanın en üstüne kaydır
+        window.print();
     }
 
-    function formEkraninaDon() {
-        document.getElementById('previewArea').style.display = 'none';
-        document.getElementById('formArea').style.display = 'block';
-    }
-
-    /* == WHATSAPP METNİ GÖNDERİMİ == */
     function whatsappYaziGonder() {
         let v = id => document.getElementById(id).value;
         let sirket = v('v_sirket_adi');
